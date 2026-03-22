@@ -1,0 +1,176 @@
+/* ============================================================================
+   BBQE (3,6,9) — Web Styles
+   BBQE is for Safety. Accent: #FFB347
+   ============================================================================ */
+
+.bbqe-container {
+  min-height: 100vh;
+  background-color: #1a1a1a;
+  overflow-y: auto;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.bbqe-header {
+  text-align: center;
+  padding-top: 40px;
+  padding-bottom: 20px;
+}
+
+.bbqe-title {
+  font-size: 48px;
+  font-weight: bold;
+  color: #FFB347;
+  margin-bottom: 8px;
+  letter-spacing: 2px;
+}
+
+.bbqe-subtitle {
+  font-size: 16px;
+  color: #ccc;
+  margin-bottom: 4px;
+}
+
+.bbqe-philosophy {
+  font-size: 12px;
+  color: #999;
+  font-style: italic;
+}
+
+.bbqe-usage {
+  text-align: center;
+  padding: 8px 20px;
+}
+
+.bbqe-usage-text {
+  color: #FFB347;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.bbqe-content {
+  padding: 0 20px 40px;
+}
+
+.bbqe-section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: white;
+  margin-top: 24px;
+  margin-bottom: 12px;
+}
+
+.bbqe-contexts {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bbqe-context-btn {
+  background-color: #333;
+  color: white;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: none;
+  border-left: 4px solid #FFB347;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.2s, border-left-color 0.2s;
+}
+
+.bbqe-context-btn:hover {
+  background-color: #3a3a3a;
+}
+
+.bbqe-context-btn.active {
+  background-color: #FFB347;
+  border-left-color: #fff;
+  color: #1a1a1a;
+}
+
+.bbqe-input {
+  width: 100%;
+  background-color: #333;
+  color: white;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin: 12px 0;
+  min-height: 100px;
+  border: none;
+  font-size: 14px;
+  resize: vertical;
+  outline: none;
+}
+
+.bbqe-input::placeholder {
+  color: #999;
+}
+
+.bbqe-input:focus {
+  box-shadow: 0 0 0 2px #FFB347;
+}
+
+.bbqe-guidance-btn {
+  width: 100%;
+  background-color: #FFB347;
+  color: #1a1a1a;
+  padding: 14px;
+  border-radius: 8px;
+  border: none;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  margin: 16px 0;
+  transition: opacity 0.2s;
+}
+
+.bbqe-guidance-btn:hover {
+  opacity: 0.9;
+}
+
+.bbqe-guidance-btn.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.bbqe-guidance-box {
+  background-color: #333;
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 20px;
+  border-left: 4px solid #FFB347;
+}
+
+.bbqe-guidance-title {
+  color: #FFB347;
+  font-weight: 700;
+  margin-bottom: 8px;
+  font-size: 16px;
+}
+
+.bbqe-guidance-text {
+  color: #ccc;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.bbqe-footer {
+  text-align: center;
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid #333;
+}
+
+.bbqe-footer-main {
+  color: #FFB347;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.bbqe-footer-small {
+  color: #999;
+  font-size: 12px;
+  margin-top: 2px;
+}
