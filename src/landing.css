@@ -1,10 +1,12 @@
-/* BBQ_e= Landing Page */
+/* BBQ e = (3,6,9) Landing Page */
 
 :root {
   --bg-dark: #000;
   --bg-body: #1a1a1a;
-  --brand-amber: #FFB347;
-  --brand-orange: #FF9500;
+  --brand-red: #8b1a1a;
+  --bbqe-red: #900003;
+  --bbqe-red-hover: #b00004;
+  --bbqe-red-text: #cc0004;
   --text-light: #e0e0e0;
   --text-muted: #999;
   --border-subtle: #333;
@@ -38,7 +40,7 @@
 .sauce-name {
   font-size: 18px;
   font-weight: bold;
-  color: var(--brand-amber);
+  color: var(--brand-red);
 }
 
 .sauce-tagline {
@@ -58,7 +60,7 @@
 }
 
 .sauce-nav-link {
-  color: var(--brand-amber);
+  color: var(--brand-red);
   font-size: 12px;
   font-weight: 500;
   text-decoration: none;
@@ -66,7 +68,7 @@
 }
 
 .sauce-nav-link:hover {
-  color: var(--brand-orange);
+  color: #a02020;
 }
 
 /* HERO */
@@ -90,15 +92,16 @@
   margin-bottom: 40px;
   border-radius: 50%;
   object-fit: cover;
-  box-shadow: 0 20px 60px rgba(255, 179, 71, 0.2);
+  box-shadow: 0 20px 60px rgba(144, 0, 3, 0.2);
 }
 
 .hero h1 {
   font-size: 4rem;
   font-weight: bold;
-  color: var(--brand-amber);
+  color: var(--bbqe-red);
   margin-bottom: 20px;
   letter-spacing: 2px;
+  font-family: Calibri, 'Trebuchet MS', sans-serif;
 }
 
 .hero .tagline {
@@ -106,6 +109,7 @@
   color: var(--text-light);
   margin-bottom: 12px;
   font-weight: 300;
+  font-family: Calibri, 'Trebuchet MS', sans-serif;
 }
 
 .hero .subtitle {
@@ -113,11 +117,12 @@
   color: var(--text-muted);
   font-style: italic;
   margin-bottom: 40px;
+  font-family: Calibri, 'Trebuchet MS', sans-serif;
 }
 
 .enter-btn {
-  background: var(--brand-amber);
-  color: #000;
+  background: var(--bbqe-red);
+  color: #fff;
   border: none;
   padding: 14px 40px;
   font-size: 1rem;
@@ -129,7 +134,7 @@
 }
 
 .enter-btn:hover {
-  background: var(--brand-orange);
+  background: var(--bbqe-red-hover);
   transform: scale(1.05);
 }
 
@@ -146,9 +151,10 @@
 .showcase-title {
   text-align: center;
   font-size: 2.5rem;
-  color: var(--brand-amber);
+  color: var(--bbqe-red);
   margin-bottom: 60px;
   letter-spacing: 1px;
+  font-family: Calibri, 'Trebuchet MS', sans-serif;
 }
 
 .showcase-container {
@@ -170,8 +176,9 @@
   font-weight: bold;
   text-transform: uppercase;
   letter-spacing: 3px;
-  color: var(--brand-amber);
+  color: var(--bbqe-red-text);
   margin-bottom: 10px;
+  font-family: Calibri, 'Trebuchet MS', sans-serif;
 }
 
 .qa-content {
@@ -184,11 +191,21 @@
   padding: 12px;
 }
 
+.qa-content-single {
+  display: flex;
+  justify-content: center;
+}
+
 .question-side,
 .answer-side {
   flex: 1;
   overflow: hidden;
   border-radius: 4px;
+}
+
+.question-side.full-width {
+  flex: unset;
+  width: 100%;
 }
 
 .question-side img,
@@ -245,7 +262,7 @@
   max-width: 300px;
   width: 100%;
   height: auto;
-  filter: drop-shadow(0 10px 30px rgba(255, 179, 71, 0.3));
+  filter: drop-shadow(0 10px 30px rgba(144, 0, 3, 0.3));
 }
 
 /* U vs THEM */
@@ -253,7 +270,7 @@
   background: linear-gradient(180deg, var(--bg-dark) 0%, #0a0a0a 100%);
   padding: 80px 20px;
   text-align: center;
-  border-top: 2px solid var(--brand-amber);
+  border-top: 2px solid var(--brand-red);
 }
 
 .uvt-header {
@@ -271,15 +288,17 @@
 
 .uvt-header h2 {
   font-size: 2.5rem;
-  color: var(--brand-amber);
+  color: var(--bbqe-red-text);
   margin-bottom: 15px;
   letter-spacing: 2px;
+  font-family: Calibri, 'Trebuchet MS', sans-serif;
 }
 
 .uvt-header p {
   font-size: 1.1rem;
   color: var(--text-muted);
   font-style: italic;
+  font-family: Calibri, 'Trebuchet MS', sans-serif;
 }
 
 .uvt-comparison {
@@ -304,15 +323,17 @@
 
 .uvt-tagline {
   font-size: 1.5rem;
-  color: var(--brand-amber);
+  color: var(--bbqe-red-text);
   font-style: italic;
   margin-bottom: 12px;
   font-weight: bold;
+  font-family: Calibri, 'Trebuchet MS', sans-serif;
 }
 
 .uvt-subtitle {
   font-size: 1rem;
   color: var(--text-muted);
+  font-family: Calibri, 'Trebuchet MS', sans-serif;
 }
 
 /* LANDING CTA */
@@ -321,11 +342,38 @@
   padding: 60px 20px;
   text-align: center;
   border-top: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.landing-cta-title {
+  font-family: Calibri, 'Trebuchet MS', sans-serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--bbqe-red-text);
+  margin-bottom: 4px;
+}
+
+.landing-cta-subtitle {
+  font-family: Calibri, 'Trebuchet MS', sans-serif;
+  font-size: 1rem;
+  color: var(--text-light);
+}
+
+.landing-cta-tagline {
+  font-family: Calibri, 'Trebuchet MS', sans-serif;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin-bottom: 8px;
 }
 
 .cta-button {
-  background: var(--brand-amber);
-  color: #000;
+  display: inline-block;
+  background: var(--bbqe-red);
+  color: #fff;
   border: none;
   padding: 16px 50px;
   font-size: 1.1rem;
@@ -334,10 +382,11 @@
   cursor: pointer;
   transition: background 0.3s ease, transform 0.2s ease;
   font-family: Calibri, 'Trebuchet MS', sans-serif;
+  text-decoration: none;
 }
 
 .cta-button:hover {
-  background: var(--brand-orange);
+  background: var(--bbqe-red-hover);
   transform: scale(1.05);
 }
 

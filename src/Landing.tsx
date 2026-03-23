@@ -6,6 +6,7 @@ interface LandingProps {
 
 const SAUCE_HOME = 'https://sauc-e.com';
 const CHECKOUT_URL = 'https://sauc-e.com/checkitout';
+const STRIPE_PAYMENT_LINK = 'https://buy.stripe.com/28E00l3HOg638gA6hxa3u00';
 
 export default function Landing({ onEnter }: LandingProps) {
   return (
@@ -53,54 +54,48 @@ export default function Landing({ onEnter }: LandingProps) {
       {/* HERO */}
       <section className="hero">
         <div className="hero-content">
-          <img src="/bbqe_logo.jpg" alt="BBQ_e=" className="bowl-logo" />
-          <h1>BBQ_e=</h1>
-          <p className="tagline">Digital Safety</p>
-          <p className="subtitle">Understanding = Awareness / Risk</p>
+          <img src="/bbqe_logo_360.png" alt="BBQE" className="bowl-logo" />
+          <h1>BBQ e = (3,6,9)</h1>
+          <p className="tagline">Signal Detection from Noise</p>
+          <p className="subtitle">Safety = Quality / Quantity</p>
           <button className="enter-btn" onClick={onEnter}>Enter App</button>
         </div>
       </section>
 
-      {/* SHOWCASE — Three Feature Pairs */}
+      {/* SHOWCASE — Three Tool Cards */}
       <section className="showcase">
         <h2 className="showcase-title">How It Works</h2>
         <div className="showcase-container">
-          
+
           {/* LINK SCANNER */}
-          <div className="qa-pair papa">
+          <div className="qa-pair link-scanner-card">
             <div className="qa-label">LINK SCANNER</div>
             <div className="qa-content">
               <div className="question-side">
-                <img src="/bbqe_link_scanner_q.png" alt="Link scanner" />
+                <img src="/bbqe_iphone_final2.png" alt="BBQE Link Scanner on iPhone" />
               </div>
               <div className="answer-side">
-                <img src="/bbqe_link_scanner_r.png" alt="Link scanner result" />
+                <img src="/bbqe_ipad_final2.png" alt="BBQE Link Scanner on iPad" />
               </div>
             </div>
           </div>
 
-          {/* WIFI CHECK */}
-          <div className="qa-pair mama">
-            <div className="qa-label">WIFI CHECK</div>
-            <div className="qa-content">
-              <div className="question-side">
-                <img src="/bbqe_wifi_q.png" alt="WiFi check" />
-              </div>
-              <div className="answer-side">
-                <img src="/bbqe_wifi_r.png" alt="WiFi result" />
+          {/* PREMIUM BLEND */}
+          <div className="qa-pair premium-blend-card">
+            <div className="qa-label">PREMIUM BLEND</div>
+            <div className="qa-content qa-content-single">
+              <div className="question-side full-width">
+                <img src="/PREMIUM_BLEND.png" alt="BBQE Premium Blend" />
               </div>
             </div>
           </div>
 
-          {/* BREACH SCANNER */}
-          <div className="qa-pair lem">
-            <div className="qa-label">BREACH SCANNER</div>
-            <div className="qa-content">
-              <div className="question-side">
-                <img src="/bbqe_breach_q.png" alt="Breach scanner" />
-              </div>
-              <div className="answer-side">
-                <img src="/bbqe_breach_r.png" alt="Breach result" />
+          {/* PITBOSS */}
+          <div className="qa-pair pitboss-card">
+            <div className="qa-label">PITBOSS</div>
+            <div className="qa-content qa-content-single">
+              <div className="question-side full-width">
+                <img src="/PITBOSS.png" alt="BBQE PitBoss" />
               </div>
             </div>
           </div>
@@ -112,10 +107,10 @@ export default function Landing({ onEnter }: LandingProps) {
       <section className="premium">
         <div className="premium-content">
           <div className="premium-bottle">
-            <img src="/bbqe_premium_bottle.png" alt="Premium tier" className="bottle-img" />
+            <img src="/PREMIUM_BLEND.png" alt="Premium Blend" className="bottle-img" />
           </div>
           <div className="premium-bottle">
-            <img src="/bbqe_pitboss_bottle.png" alt="PitBoss tier" className="bottle-img" />
+            <img src="/PITBOSS.png" alt="PitBoss" className="bottle-img" />
           </div>
         </div>
       </section>
@@ -123,24 +118,34 @@ export default function Landing({ onEnter }: LandingProps) {
       {/* U vs THEM */}
       <section className="u-vs-them">
         <div className="uvt-header">
-          <img src="/bbqe_logo.jpg" alt="BBQ_e=" className="uvt-logo" />
-          <h2>BBQ_e= (3,6,9) US vs THEM</h2>
+          <img src="/bbqe_logo_360.png" alt="BBQE" className="uvt-logo" />
+          <h2>BBQE (3,6,9) US vs THEM</h2>
           <p>We've got your back so you can face front.</p>
         </div>
-        
+
         <div className="uvt-comparison">
-          <img src="/bbqe_us_v_them.png" alt="US vs THEM comparison" className="uvt-image" />
+          <img src="/bbqe_uvt.png" alt="BBQE US vs THEM comparison" className="uvt-image" />
         </div>
 
         <div className="uvt-footer">
           <p className="uvt-tagline">"Education, not fear."</p>
-          <p className="uvt-subtitle">Covenant pricing. Real security.</p>
+          <p className="uvt-subtitle">Annual Security just 1.01 away from 21!</p>
         </div>
       </section>
 
       {/* CTA */}
       <section className="landing-cta">
-        <button className="cta-button" onClick={onEnter}>Start Securing</button>
+        <h2 className="landing-cta-title">What Mobile Security Can Actually Do</h2>
+        <p className="landing-cta-subtitle">Education, not fear. $0.99/mo or $19.99/yr.</p>
+        <p className="landing-cta-tagline">We've got your back so you can face front.</p>
+        <a
+          href={STRIPE_PAYMENT_LINK}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="cta-button"
+        >
+          Start Scanning
+        </a>
       </section>
     </div>
   );
