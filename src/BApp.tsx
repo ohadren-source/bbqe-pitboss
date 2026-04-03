@@ -89,15 +89,14 @@ function App() {
     const submittedUrl = url.trim()
 
     try {
-      const response = await fetch(`${BACKEND_URL}/api/bbqe/get-guidance`, {
+      const response = await fetch(`${BACKEND_URL}/api/bbqe/scan-link`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           customerId: customerId || 'anonymous',
-          situation: submittedUrl,
-          context: 'link-scan',
+          url: submittedUrl,
         }),
       })
 
@@ -113,7 +112,12 @@ function App() {
       }
 
       const data = await response.json()
-      setScanResult(data as ScanResult)
+      setScanResult({
+        severity: data.threatLevel ?? 'LOW',
+        score: data.score ?? 0,
+        description: data.summary ?? '',
+        findings: data.flags ?? [],
+      })
       setScannedUrl(submittedUrl)
       setScanCount((prev) => prev + 1)
       setUrl('')
