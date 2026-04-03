@@ -89,10 +89,10 @@ function App() {
       }
       const data = await response.json()
       setScanResult({
-        severity: data.threatLevel,
-        score: data.score,
-        description: data.summary,
-        findings: data.flags,
+        severity: data.threatLevel ?? 'LOW',
+        score: data.score ?? 0,
+        description: data.summary ?? '',
+        findings: data.flags ?? [],
       })
       setScannedUrl(submittedUrl)
       setScanCount((prev) => prev + 1)
