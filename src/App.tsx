@@ -5,7 +5,7 @@ import { FingerprintManager } from '@sauc-e/fingerprint-manager'
 
 const BACKEND_URL = 'https://sauc-e-backend-production.up.railway.app'
 const FREE_SCAN_LIMIT = 9
-const STRIPE_PAYMENT_LINK = 'https://www.sauc-e.com/checkitout'
+const CHECKOUT_PAYMENT_LINK = 'https://www.sauc-e.com/checkitout'
 const SAUCE_HOME = 'https://sauc-e.com'
 const CHECKOUT_URL = 'https://sauc-e.com/checkitout'
 const PRIVACY_POLICY_URL = 'https://docs.google.com/document/d/1AxzEmZn2AjEY7ry6HSM1S6mlB3ggs0SN'
@@ -25,7 +25,27 @@ function App() {
   const [isSubscribed] = useState(() => {
     const params = new URLSearchParams(window.location.search)
     if (params.get('subscribed') === 'true') {
+      // Handle PayPal: subscription_id + payment_provider
+      let subscriptionId = params.get('subscription_id')
+      let paymentProvider = params.get('payment_provider')
+
+      // Handle Stripe: session_id parameter
+      if (!subscriptionId && params.get('session_id')) {
+        subscriptionId = params.get('session_id')
+        paymentProvider = 'stripe'
+      }
+
+      // Store payment info for verification and redirect to clean URL
+      if (subscriptionId && paymentProvider) {
+        sessionStorage.setItem('pending_payment_verification', JSON.stringify({
+          subscription_id: subscriptionId,
+          payment_provider: paymentProvider
+        }))
+      }
+
       localStorage.setItem('sauce_premium', 'true')
+      // Clean URL by removing query params
+      window.history.replaceState({}, document.title, window.location.pathname)
     }
     return localStorage.getItem('sauce_premium') === 'true'
   })
@@ -41,6 +61,16 @@ function App() {
 
   useEffect(() => {
     syncUsageCount()
+  }, [])
+
+  useEffect(() => {
+    // Handle payment verification on redirect from payment provider
+    const pendingVerification = sessionStorage.getItem('pending_payment_verification')
+    if (pendingVerification) {
+      const paymentInfo = JSON.parse(pendingVerification)
+      verifyPayment(paymentInfo)
+      sessionStorage.removeItem('pending_payment_verification')
+    }
   }, [])
 
   async function syncUsageCount() {
@@ -60,13 +90,36 @@ function App() {
     }
   }
 
+  async function verifyPayment(paymentInfo: { subscription_id: string; payment_provider: string }) {
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/bbqe/usage-status`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fingerprint: fpManager.getFingerprint(),
+          subscription_id: paymentInfo.subscription_id,
+          payment_provider: paymentInfo.payment_provider,
+        }),
+      })
+      if (response.ok) {
+        const data = await response.json()
+        setScanCount(data.usageCount || 0)
+        // Payment verification succeeded - user now has premium access
+      }
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : 'unknown'
+      console.log('Payment verification error:', msg)
+      // Log but don't fail - user will have localStorage flag
+    }
+  }
+
   async function handleScan() {
     if (!url.trim()) {
       alert('Please enter a URL to scan')
       return
     }
     if (!isSubscribed && scanCount >= FREE_SCAN_LIMIT) {
-      window.open(STRIPE_PAYMENT_LINK, '_blank')
+      window.open(CHECKOUT_PAYMENT_LINK, '_blank')
       return
     }
     setLoading(true)
@@ -83,7 +136,7 @@ function App() {
       if (!response.ok) {
         const errorData = await response.json()
         if (response.status === 403) {
-          window.open(STRIPE_PAYMENT_LINK, '_blank')
+          window.open(CHECKOUT_PAYMENT_LINK, '_blank')
           return
         }
         throw new Error(errorData.error || 'Failed to scan link')
@@ -150,7 +203,7 @@ function App() {
         {!isSubscribed && (
           <div className="premium-section">
             <a
-              href={STRIPE_PAYMENT_LINK}
+              href={CHECKOUT_PAYMENT_LINK}
               target="_blank"
               rel="noopener noreferrer"
               className={`premium-pill${freeLeft === 0 ? ' premium-pill-urgent' : ''}`}
@@ -219,7 +272,7 @@ function App() {
               <div className="bbqe-locked-content">
                 <p className="bbqe-locked-badge">🔒 Premium Feature</p>
                 <p className="bbqe-locked-text">WiFi Check scans your current network for vulnerabilities, rogue access points, and man-in-the-middle risks.</p>
-                <a href={STRIPE_PAYMENT_LINK} target="_blank" rel="noopener noreferrer" className="bbqe-upgrade-link">Upgrade to Premium to unlock</a>
+                <a href={CHECKOUT_PAYMENT_LINK} target="_blank" rel="noopener noreferrer" className="bbqe-upgrade-link">Upgrade to Premium to unlock</a>
               </div>
               <div className="bbqe-how-it-works">
                 <p className="bbqe-hiw-text">WiFi Check analyzes the network you're connected to — checking for open ports, weak encryption, ARP spoofing indicators, and known rogue hotspot patterns. Available on Premium.</p>
@@ -232,7 +285,7 @@ function App() {
               <div className="bbqe-locked-content">
                 <p className="bbqe-locked-badge">🔒 PitBoss Feature</p>
                 <p className="bbqe-locked-text">Breach Scan checks your email addresses against known data breaches and credential leaks.</p>
-                <a href={STRIPE_PAYMENT_LINK} target="_blank" rel="noopener noreferrer" className="bbqe-upgrade-link">Upgrade to PitBoss to unlock</a>
+                <a href={CHECKOUT_PAYMENT_LINK} target="_blank" rel="noopener noreferrer" className="bbqe-upgrade-link">Upgrade to PitBoss to unlock</a>
               </div>
               <div className="bbqe-how-it-works">
                 <p className="bbqe-hiw-text">Breach Scan cross-references your email against hundreds of known breach databases. Available on PitBoss.</p>
@@ -257,7 +310,7 @@ function App() {
             <h2 className="bbqe-cta-title">What Mobile Security Can Actually Do</h2>
             <p className="bbqe-cta-subtitle">Education, not fear. $0.99/mo or $19.99/yr.</p>
             <p className="bbqe-cta-tagline">We've got your back so you can face front.</p>
-            <a href={STRIPE_PAYMENT_LINK} target="_blank" rel="noopener noreferrer" className="bbqe-cta-btn">Subscribe at sauc-e.com</a>
+            <a href={CHECKOUT_PAYMENT_LINK} target="_blank" rel="noopener noreferrer" className="bbqe-cta-btn">Subscribe at sauc-e.com</a>
           </section>
         )}
 
