@@ -5,7 +5,7 @@ import { FingerprintManager } from '@sauc-e/fingerprint-manager'
 
 const BACKEND_URL = 'https://sauc-e-backend-production.up.railway.app'
 const FREE_SCAN_LIMIT = 9
-const STRIPE_PAYMENT_LINK = 'https://buy.stripe.com/28E00l3HOg638gA6hxa3u00'
+const STRIPE_PAYMENT_LINK = 'https://www.sauc-e.com/checkitout'
 const SAUCE_HOME = 'https://sauc-e.com'
 const CHECKOUT_URL = 'https://sauc-e.com/checkitout'
 const PRIVACY_POLICY_URL = 'https://docs.google.com/document/d/1AxzEmZn2AjEY7ry6HSM1S6mlB3ggs0SN'
