@@ -119,7 +119,7 @@ function App() {
       return
     }
     if (!isSubscribed && scanCount >= FREE_SCAN_LIMIT) {
-      window.open(CHECKOUT_PAYMENT_LINK, '_blank')
+      window.open(CHECKOUT_PAYMENT_LINK + '?app=bbqe', '_blank')
       return
     }
     setLoading(true)
@@ -136,7 +136,7 @@ function App() {
       if (!response.ok) {
         const errorData = await response.json()
         if (response.status === 403) {
-          window.open(CHECKOUT_PAYMENT_LINK, '_blank')
+          window.open(CHECKOUT_PAYMENT_LINK + '?app=bbqe', '_blank')
           return
         }
         throw new Error(errorData.error || 'Failed to scan link')
@@ -203,7 +203,7 @@ function App() {
         {!isSubscribed && (
           <div className="premium-section">
             <a
-              href={CHECKOUT_PAYMENT_LINK}
+              href={CHECKOUT_PAYMENT_LINK + '?app=bbqe'}
               target="_blank"
               rel="noopener noreferrer"
               className={`premium-pill${freeLeft === 0 ? ' premium-pill-urgent' : ''}`}
@@ -272,7 +272,7 @@ function App() {
               <div className="bbqe-locked-content">
                 <p className="bbqe-locked-badge">🔒 Premium Feature</p>
                 <p className="bbqe-locked-text">WiFi Check scans your current network for vulnerabilities, rogue access points, and man-in-the-middle risks.</p>
-                <a href={CHECKOUT_PAYMENT_LINK} target="_blank" rel="noopener noreferrer" className="bbqe-upgrade-link">Upgrade to Premium to unlock</a>
+                <a href={CHECKOUT_PAYMENT_LINK + '?app=bbqe'} target="_blank" rel="noopener noreferrer" className="bbqe-upgrade-link">Upgrade to Premium to unlock</a>
               </div>
               <div className="bbqe-how-it-works">
                 <p className="bbqe-hiw-text">WiFi Check analyzes the network you're connected to — checking for open ports, weak encryption, ARP spoofing indicators, and known rogue hotspot patterns. Available on Premium.</p>
@@ -285,7 +285,7 @@ function App() {
               <div className="bbqe-locked-content">
                 <p className="bbqe-locked-badge">🔒 PitBoss Feature</p>
                 <p className="bbqe-locked-text">Breach Scan checks your email addresses against known data breaches and credential leaks.</p>
-                <a href={CHECKOUT_PAYMENT_LINK} target="_blank" rel="noopener noreferrer" className="bbqe-upgrade-link">Upgrade to PitBoss to unlock</a>
+                <a href={CHECKOUT_PAYMENT_LINK + '?app=bbqe'} target="_blank" rel="noopener noreferrer" className="bbqe-upgrade-link">Upgrade to PitBoss to unlock</a>
               </div>
               <div className="bbqe-how-it-works">
                 <p className="bbqe-hiw-text">Breach Scan cross-references your email against hundreds of known breach databases. Available on PitBoss.</p>
@@ -310,7 +310,7 @@ function App() {
             <h2 className="bbqe-cta-title">What Mobile Security Can Actually Do</h2>
             <p className="bbqe-cta-subtitle">Education, not fear. $0.99/mo or $19.99/yr.</p>
             <p className="bbqe-cta-tagline">We've got your back so you can face front.</p>
-            <a href={CHECKOUT_PAYMENT_LINK} target="_blank" rel="noopener noreferrer" className="bbqe-cta-btn">Subscribe at sauc-e.com</a>
+            <a href={CHECKOUT_PAYMENT_LINK + '?app=bbqe'} target="_blank" rel="noopener noreferrer" className="bbqe-cta-btn">Subscribe at sauc-e.com</a>
           </section>
         )}
 
