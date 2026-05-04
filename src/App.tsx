@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import './App.css'
 import Landing from './Landing'
+import { FingerprintManager } from '@sauc-e/fingerprint-manager'
 
 const BACKEND_URL = 'https://sauc-e-backend-production.up.railway.app'
 const FREE_SCAN_LIMIT = 9
@@ -34,20 +35,20 @@ function App() {
   const [scanResult, setScanResult] = useState<ScanResult | null>(null)
   const [scannedUrl, setScannedUrl] = useState('')
   const [loading, setLoading] = useState(false)
-  const [customerId] = useState<string | null>(null)
+  const fpManager = new FingerprintManager()
 
   const freeLeft = Math.max(0, FREE_SCAN_LIMIT - scanCount)
 
   useEffect(() => {
-    syncUsageCount('web-user')
+    syncUsageCount()
   }, [])
 
-  async function syncUsageCount(cid: string) {
+  async function syncUsageCount() {
     try {
       const response = await fetch(`${BACKEND_URL}/api/bbqe/usage-status`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ customerId: cid || 'anonymous' }),
+        body: JSON.stringify({ fingerprint: fpManager.getFingerprint() }),
       })
       if (response.ok) {
         const data = await response.json()
@@ -75,7 +76,7 @@ function App() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          customerId: customerId || 'anonymous',
+          fingerprint: fpManager.getFingerprint(),
           url: submittedUrl,
         }),
       })
