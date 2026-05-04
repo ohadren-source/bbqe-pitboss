@@ -22,7 +22,7 @@ interface ScanResult {
 
 function App() {
   const [showLanding, setShowLanding] = useState(true)
-  const [isSubscribed] = useState(() => {
+  const [isSubscribed, setIsSubscribed] = useState(() => {
     const params = new URLSearchParams(window.location.search)
     if (params.get('subscribed') === 'true') {
       // Handle PayPal: subscription_id + payment_provider
@@ -78,7 +78,7 @@ function App() {
       const response = await fetch(`${BACKEND_URL}/api/bbqe/usage-status`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fingerprint: fpManager.getFingerprint() }),
+        body: JSON.stringify({ customerId: fpManager.getFingerprint() }),
       })
       if (response.ok) {
         const data = await response.json()
@@ -96,7 +96,7 @@ function App() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          fingerprint: fpManager.getFingerprint(),
+          customerId: fpManager.getFingerprint(),
           subscription_id: paymentInfo.subscription_id,
           payment_provider: paymentInfo.payment_provider,
         }),
@@ -104,6 +104,7 @@ function App() {
       if (response.ok) {
         const data = await response.json()
         setScanCount(data.usageCount || 0)
+        setIsSubscribed(true)
         // Payment verification succeeded - user now has premium access
       }
     } catch (error: unknown) {
@@ -129,7 +130,7 @@ function App() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          fingerprint: fpManager.getFingerprint(),
+          customerId: fpManager.getFingerprint(),
           url: submittedUrl,
         }),
       })
