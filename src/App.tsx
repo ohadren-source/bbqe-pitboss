@@ -5,8 +5,7 @@ import { FingerprintManager } from '@sauc-e/fingerprint-manager'
 
 const BACKEND_URL = 'https://sauc-e-backend-production.up.railway.app'
 const FREE_SCAN_LIMIT = 9
-// const CHECKOUT_PAYMENT_LINK = 'https://www.sauc-e.com/checkitout'
-const CHECKOUT_PAYMENT_LINK = 'https://buy.stripe.com/test_6oUeVfa6c7zx9kE35la3u02'
+const CHECKOUT_PAYMENT_LINK = 'https://www.sauc-e.com/checkitout'
 const SAUCE_HOME = 'https://sauc-e.com'
 const CHECKOUT_URL = 'https://sauc-e.com/checkitout'
 const PRIVACY_POLICY_URL = 'https://docs.google.com/document/d/1AxzEmZn2AjEY7ry6HSM1S6mlB3ggs0SN'
@@ -80,10 +79,7 @@ function App() {
       const response = await fetch(`${BACKEND_URL}/api/db/get-subscription-status`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          fingerprint: fpManager.getFingerprint(),
-          app_name: 'bbqe'
-        }),
+        body: JSON.stringify({ customerId: fpManager.getFingerprint() }),
       })
       if (response.ok) {
         const data = await response.json()
@@ -102,8 +98,7 @@ function App() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          fingerprint: fpManager.getFingerprint(),
-          app_name: 'bbqe',
+          customerId: fpManager.getFingerprint(),
           subscription_id: paymentInfo.subscription_id,
           payment_provider: paymentInfo.payment_provider,
         }),
