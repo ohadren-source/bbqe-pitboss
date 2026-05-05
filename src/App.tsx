@@ -45,7 +45,7 @@ function App() {
       }
 
       localStorage.setItem('sauce_premium', 'true')
-      // Clean URL by removing query params - AFTER storing payment info
+      // Clean URL by removing query params
       window.history.replaceState({}, document.title, window.location.pathname)
     }
     return localStorage.getItem('sauce_premium') === 'true'
@@ -87,11 +87,8 @@ function App() {
       })
       if (response.ok) {
         const data = await response.json()
-        setScanCount(data.uses_remaining ? FREE_SCAN_LIMIT - (999999 - data.uses_remaining) : 0)
-        setSubscriptionTier(data.subscription_tier || null)
-        if (data.is_paid) {
-          setIsSubscribed(true)
-        }
+        setScanCount(data.usageCount || 0)
+        setSubscriptionTier(data.subscriptionTier || null)
       }
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : 'unknown'
@@ -101,11 +98,12 @@ function App() {
 
   async function verifyPayment(paymentInfo: { subscription_id: string; payment_provider: string }) {
     try {
-      const response = await fetch(`${BACKEND_URL}/api/bbqe/usage-status`, {
+      const response = await fetch(`${BACKEND_URL}/api/db/get-subscription-status`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          customerId: fpManager.getFingerprint(),
+          fingerprint: fpManager.getFingerprint(),
+          app_name: 'bbqe',
           subscription_id: paymentInfo.subscription_id,
           payment_provider: paymentInfo.payment_provider,
         }),
@@ -268,7 +266,7 @@ function App() {
                     </ul>
                   )}
                   <div className="bbqe-how-it-works">
-                    <p className="bbqe-hiw-text">BBQE checks the link against threat intelligence, domain reputation, and known phishing patterns. A score closer to 0 means safer. 100 means critical.</p>
+                    <p className="bbqe-hiw-text">BBQE checks the link against threat intelligence, domain reputation, and known phishing patterns. A score closer to 0 means safer. 100 means critical risk.</p>
                   </div>
                   <div className="bbqe-card-footer">
                     <p className="bbqe-card-footer-line">The Shield (Front of the House) and The Bond (Back Home)</p>
@@ -285,7 +283,7 @@ function App() {
               )}
               {!scanResult && (
                 <div className="bbqe-how-it-works">
-                  <p className="bbqe-hiw-text">Paste any suspicious URL above. BBQE checks for phishing domains, malware redirects, lookalike URLs, and known threat patterns.</p>
+                  <p className="bbqe-hiw-text">Paste any suspicious URL above. BBQE checks for phishing domains, malware redirects, lookalike URLs, and known threat patterns — returning a severity score so you know exactly what you're dealing with.</p>
                 </div>
               )}
             </div>
@@ -299,7 +297,7 @@ function App() {
                 <a href={CHECKOUT_PAYMENT_LINK + '?app=bbqe'} target="_blank" rel="noopener noreferrer" className="bbqe-upgrade-link">Upgrade to Premium to unlock</a>
               </div>
               <div className="bbqe-how-it-works">
-                <p className="bbqe-hiw-text">WiFi Check analyzes the network you're connected to — checking for open ports, weak encryption, ARP spoofing indicators, and known rogue hotspot patterns.</p>
+                <p className="bbqe-hiw-text">WiFi Check analyzes the network you're connected to — checking for open ports, weak encryption, ARP spoofing indicators, and known rogue hotspot patterns. Available on Premium.</p>
               </div>
             </div>
           )}
