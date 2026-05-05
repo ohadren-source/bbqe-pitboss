@@ -77,6 +77,8 @@ function App() {
 
   useEffect(() => {
     syncUsageCount()
+    // TEMPORARY: Set counter to 99 for WiFi testing
+    setCounterForTesting()
   }, [])
 
   useEffect(() => {
@@ -103,6 +105,29 @@ function App() {
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : 'unknown'
       console.log('Usage sync skipped:', msg)
+    }
+  }
+
+  async function setCounterForTesting() {
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/test/set-counter`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customerId: fpManager.getFingerprint(),
+          app_name: 'bbqe',
+          uses_remaining: 99
+        }),
+      })
+      if (response.ok) {
+        const data = await response.json()
+        console.log('[TEST] Counter set to 99 for WiFi testing:', data)
+        // Update local counter display
+        setScanCount(0)
+      }
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : 'unknown'
+      console.log('[TEST] Counter override skipped (endpoint may not be ready):', msg)
     }
   }
 
@@ -390,7 +415,7 @@ function App() {
                     </>
                   )}
                   <div className="bbqe-how-it-works">
-                    <p className="bbqe-hiw-text">WiFi Check analyzes network encryption, known vulnerability patterns, and security best practices. Stronger encryption (WPA3) scores higher. Open networks and deprecated standards (WEP) are flagged as critical risks.</p>
+                    <p className="bbqe-hiw-text">WiFi Check analyzes network encryption, known vulnerability patterns, and security best practices. Stronger encryption (WPA3) scores higher. Open [...]
                   </div>
                   <div className="bbqe-card-footer">
                     <p className="bbqe-card-footer-line">The Shield (Front of the House) and The Bond (Back Home)</p>
@@ -407,7 +432,7 @@ function App() {
               )}
               {!wifiResult && (
                 <div className="bbqe-how-it-works">
-                  <p className="bbqe-hiw-text">Enter your WiFi network name and encryption type above. BBQE checks for weak or deprecated encryption standards, known vulnerability patterns in your network configuration, and provides hardening recommendations.</p>
+                  <p className="bbqe-hiw-text">Enter your WiFi network name and encryption type above. BBQE checks for weak or deprecated encryption standards, known vulnerability patterns in you[...]
                 </div>
               )}
             </div>
