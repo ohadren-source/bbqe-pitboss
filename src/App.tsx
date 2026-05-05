@@ -5,8 +5,7 @@ import { FingerprintManager } from '@sauc-e/fingerprint-manager'
 
 const BACKEND_URL = 'https://sauc-e-backend-production.up.railway.app'
 const FREE_SCAN_LIMIT = 9
-// const CHECKOUT_PAYMENT_LINK = 'https://www.sauc-e.com/checkitout'
-const CHECKOUT_PAYMENT_LINK = 'https://buy.stripe.com/test_6oUeVfa6c7zx9kE35la3u02'
+const CHECKOUT_PAYMENT_LINK = 'https://www.sauc-e.com/checkitout'
 const SAUCE_HOME = 'https://sauc-e.com'
 const CHECKOUT_URL = 'https://sauc-e.com/checkitout'
 const PRIVACY_POLICY_URL = 'https://docs.google.com/document/d/1AxzEmZn2AjEY7ry6HSM1S6mlB3ggs0SN'
@@ -56,10 +55,9 @@ function App() {
   const [scanResult, setScanResult] = useState<ScanResult | null>(null)
   const [scannedUrl, setScannedUrl] = useState('')
   const [loading, setLoading] = useState(false)
-  const [subscriptionTier, setSubscriptionTier] = useState<string | null>(null)
   const fpManager = new FingerprintManager()
 
-  const freeLeft = (isSubscribed && subscriptionTier) ? 999999 : Math.max(0, FREE_SCAN_LIMIT - scanCount)
+  const freeLeft = Math.max(0, FREE_SCAN_LIMIT - scanCount)
 
   useEffect(() => {
     syncUsageCount()
@@ -77,18 +75,14 @@ function App() {
 
   async function syncUsageCount() {
     try {
-      const response = await fetch(`${BACKEND_URL}/api/db/get-subscription-status`, {
+      const response = await fetch(`${BACKEND_URL}/api/bbqe/usage-status`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          fingerprint: fpManager.getFingerprint(),
-          app_name: 'bbqe'
-        }),
+        body: JSON.stringify({ customerId: fpManager.getFingerprint() }),
       })
       if (response.ok) {
         const data = await response.json()
         setScanCount(data.usageCount || 0)
-        setSubscriptionTier(data.subscriptionTier || null)
       }
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : 'unknown'
@@ -98,12 +92,11 @@ function App() {
 
   async function verifyPayment(paymentInfo: { subscription_id: string; payment_provider: string }) {
     try {
-      const response = await fetch(`${BACKEND_URL}/api/db/get-subscription-status`, {
+      const response = await fetch(`${BACKEND_URL}/api/bbqe/usage-status`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          fingerprint: fpManager.getFingerprint(),
-          app_name: 'bbqe',
+          customerId: fpManager.getFingerprint(),
           subscription_id: paymentInfo.subscription_id,
           payment_provider: paymentInfo.payment_provider,
         }),
@@ -111,7 +104,6 @@ function App() {
       if (response.ok) {
         const data = await response.json()
         setScanCount(data.usageCount || 0)
-        setSubscriptionTier(data.subscriptionTier || null)
         setIsSubscribed(true)
         // Payment verification succeeded - user now has premium access
       }
@@ -127,8 +119,7 @@ function App() {
       alert('Please enter a URL to scan')
       return
     }
-    const hasValidSubscription = isSubscribed && subscriptionTier
-    if (!hasValidSubscription && scanCount >= FREE_SCAN_LIMIT) {
+    if (!isSubscribed && scanCount >= FREE_SCAN_LIMIT) {
       window.open(CHECKOUT_PAYMENT_LINK + '?app=bbqe', '_blank')
       return
     }
@@ -210,7 +201,7 @@ function App() {
           <p className="bbqe-philosophy">Safety = Quality / Quantity</p>
         </header>
 
-        {!isSubscribed || !subscriptionTier ? (
+        {!isSubscribed && (
           <div className="premium-section">
             <a
               href={CHECKOUT_PAYMENT_LINK + '?app=bbqe'}
@@ -221,25 +212,13 @@ function App() {
               {freeLeft > 0 ? `Free · ${freeLeft} scans left` : 'Upgrade to Premium · $0.99/mo'}
             </a>
           </div>
-        ) : null}
+        )}
 
         <main className="bbqe-content">
           <div className="bbqe-tabs">
             <button className={`bbqe-tab-pill${activeTab === 'link-scanner' ? ' active' : ''}`} onClick={() => setActiveTab('link-scanner')}>Link Scanner</button>
-            <button
-              className={`bbqe-tab-pill${activeTab === 'wifi-check' ? ' active' : ''}${subscriptionTier !== 'premium-blend-bbqe' && subscriptionTier !== 'pitboss-bbqe' ? ' bbqe-tab-locked' : ''}`}
-              disabled={subscriptionTier !== 'premium-blend-bbqe' && subscriptionTier !== 'pitboss-bbqe'}
-              onClick={() => setActiveTab('wifi-check')}
-            >
-              WiFi Check {subscriptionTier !== 'premium-blend-bbqe' && subscriptionTier !== 'pitboss-bbqe' ? '🔒' : ''}
-            </button>
-            <button
-              className={`bbqe-tab-pill${activeTab === 'breach-scan' ? ' active' : ''}${subscriptionTier !== 'pitboss-bbqe' ? ' bbqe-tab-locked' : ''}`}
-              disabled={subscriptionTier !== 'pitboss-bbqe'}
-              onClick={() => setActiveTab('breach-scan')}
-            >
-              Breach Scan {subscriptionTier !== 'pitboss-bbqe' ? '🔒' : ''}
-            </button>
+            <button className="bbqe-tab-pill bbqe-tab-locked" disabled onClick={() => setActiveTab('wifi-check')}>WiFi Check 🔒</button>
+            <button className="bbqe-tab-pill bbqe-tab-locked" disabled onClick={() => setActiveTab('breach-scan')}>Breach Scan 🔒</button>
           </div>
 
           {activeTab === 'link-scanner' && (
@@ -317,7 +296,7 @@ function App() {
 
           <div className="bbqe-tiers-table">
             <h2 className="bbqe-section-title">Plans</h2>
-            <div className="bbqe-tier-row"><div className="bbqe-tier-name">Free</div><div className="bbqe-tier-desc">Link Scanner (9 scans)</div></div>
+            <div className="bbqe-tier-row"><div className="bbqe-tier-name">Free</div><div className="bbqe-tier-desc">Link Scanner (5 scans)</div></div>
             <div className="bbqe-tier-row"><div className="bbqe-tier-name bbqe-tier-premium">Premium</div><div className="bbqe-tier-desc">+ WiFi Check (unlimited)</div></div>
             <div className="bbqe-tier-row"><div className="bbqe-tier-name bbqe-tier-pitboss">PitBoss</div><div className="bbqe-tier-desc">+ Breach Scanner (unlimited)</div></div>
           </div>
@@ -327,14 +306,14 @@ function App() {
           <img src="/bbqe_uvt.png" alt="BBQE — Us vs Them" className="bbqe-marketing-img bbqe-uvt-img" />
         </section>
 
-        {!isSubscribed || !subscriptionTier ? (
+        {!isSubscribed && (
           <section className="bbqe-cta-section">
             <h2 className="bbqe-cta-title">What Mobile Security Can Actually Do</h2>
             <p className="bbqe-cta-subtitle">Education, not fear. $0.99/mo or $19.99/yr.</p>
             <p className="bbqe-cta-tagline">We've got your back so you can face front.</p>
             <a href={CHECKOUT_PAYMENT_LINK + '?app=bbqe'} target="_blank" rel="noopener noreferrer" className="bbqe-cta-btn">Subscribe at sauc-e.com</a>
           </section>
-        ) : null}
+        )}
 
         <div className="bbqe-legal">
           <a href={`${SAUCE_HOME}/terms`} target="_blank" rel="noopener noreferrer" className="bbqe-legal-link">Terms of Service</a>
