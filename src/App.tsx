@@ -76,7 +76,7 @@ function App() {
 
   async function syncUsageCount() {
     try {
-      const response = await fetch(`${BACKEND_URL}/api/bbqe/usage-status`, {
+      const response = await fetch(`${BACKEND_URL}/api/db/get-subscription-status`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ customerId: fpManager.getFingerprint() }),
@@ -94,7 +94,7 @@ function App() {
 
   async function verifyPayment(paymentInfo: { subscription_id: string; payment_provider: string }) {
     try {
-      const response = await fetch(`${BACKEND_URL}/api/bbqe/usage-status`, {
+      const response = await fetch(`${BACKEND_URL}/api/db/get-subscription-status`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -222,18 +222,18 @@ function App() {
           <div className="bbqe-tabs">
             <button className={`bbqe-tab-pill${activeTab === 'link-scanner' ? ' active' : ''}`} onClick={() => setActiveTab('link-scanner')}>Link Scanner</button>
             <button
-              className={`bbqe-tab-pill${activeTab === 'wifi-check' ? ' active' : ''}${subscriptionTier !== 'bbqe-premium' && subscriptionTier !== 'bbqe-pitboss' ? ' bbqe-tab-locked' : ''}`}
-              disabled={subscriptionTier !== 'bbqe-premium' && subscriptionTier !== 'bbqe-pitboss'}
+              className={`bbqe-tab-pill${activeTab === 'wifi-check' ? ' active' : ''}${subscriptionTier !== 'premium-blend-bbqe' && subscriptionTier !== 'pitboss-bbqe' ? ' bbqe-tab-locked' : ''}`}
+              disabled={subscriptionTier !== 'premium-blend-bbqe' && subscriptionTier !== 'pitboss-bbqe'}
               onClick={() => setActiveTab('wifi-check')}
             >
-              WiFi Check {subscriptionTier !== 'bbqe-premium' && subscriptionTier !== 'bbqe-pitboss' ? '🔒' : ''}
+              WiFi Check {subscriptionTier !== 'premium-blend-bbqe' && subscriptionTier !== 'pitboss-bbqe' ? '🔒' : ''}
             </button>
             <button
-              className={`bbqe-tab-pill${activeTab === 'breach-scan' ? ' active' : ''}${subscriptionTier !== 'bbqe-pitboss' ? ' bbqe-tab-locked' : ''}`}
-              disabled={subscriptionTier !== 'bbqe-pitboss'}
+              className={`bbqe-tab-pill${activeTab === 'breach-scan' ? ' active' : ''}${subscriptionTier !== 'pitboss-bbqe' ? ' bbqe-tab-locked' : ''}`}
+              disabled={subscriptionTier !== 'pitboss-bbqe'}
               onClick={() => setActiveTab('breach-scan')}
             >
-              Breach Scan {subscriptionTier !== 'bbqe-pitboss' ? '🔒' : ''}
+              Breach Scan {subscriptionTier !== 'pitboss-bbqe' ? '🔒' : ''}
             </button>
           </div>
 
@@ -261,7 +261,7 @@ function App() {
                     </ul>
                   )}
                   <div className="bbqe-how-it-works">
-                    <p className="bbqe-hiw-text">BBQE checks the link against threat intelligence, domain reputation, and known phishing patterns. A score closer to 0 means safer. 100 means critical risk.</p>
+                    <p className="bbqe-hiw-text">BBQE checks the link against threat intelligence, domain reputation, and known phishing patterns. A score closer to 0 means safer. 100 means criti[...]
                   </div>
                   <div className="bbqe-card-footer">
                     <p className="bbqe-card-footer-line">The Shield (Front of the House) and The Bond (Back Home)</p>
@@ -278,7 +278,7 @@ function App() {
               )}
               {!scanResult && (
                 <div className="bbqe-how-it-works">
-                  <p className="bbqe-hiw-text">Paste any suspicious URL above. BBQE checks for phishing domains, malware redirects, lookalike URLs, and known threat patterns — returning a severity score so you know exactly what you're dealing with.</p>
+                  <p className="bbqe-hiw-text">Paste any suspicious URL above. BBQE checks for phishing domains, malware redirects, lookalike URLs, and known threat patterns — returning a sever[...]
                 </div>
               )}
             </div>
@@ -292,7 +292,7 @@ function App() {
                 <a href={CHECKOUT_PAYMENT_LINK + '?app=bbqe'} target="_blank" rel="noopener noreferrer" className="bbqe-upgrade-link">Upgrade to Premium to unlock</a>
               </div>
               <div className="bbqe-how-it-works">
-                <p className="bbqe-hiw-text">WiFi Check analyzes the network you're connected to — checking for open ports, weak encryption, ARP spoofing indicators, and known rogue hotspot patterns. Available on Premium.</p>
+                <p className="bbqe-hiw-text">WiFi Check analyzes the network you're connected to — checking for open ports, weak encryption, ARP spoofing indicators, and known rogue hotspot pat[...]
               </div>
             </div>
           )}
