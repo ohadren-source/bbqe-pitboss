@@ -80,7 +80,10 @@ function App() {
       const response = await fetch(`${BACKEND_URL}/api/db/get-subscription-status`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ customerId: fpManager.getFingerprint() }),
+        body: JSON.stringify({ 
+          fingerprint: fpManager.getFingerprint(),
+          app_name: 'bbqe'
+        }),
       })
       if (response.ok) {
         const data = await response.json()
@@ -99,7 +102,8 @@ function App() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          customerId: fpManager.getFingerprint(),
+          fingerprint: fpManager.getFingerprint(),
+          app_name: 'bbqe',
           subscription_id: paymentInfo.subscription_id,
           payment_provider: paymentInfo.payment_provider,
         }),
