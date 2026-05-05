@@ -135,10 +135,11 @@ function App() {
       alert('Please enter a URL to scan')
       return
     }
-    if (!isSubscribed && scanCount >= FREE_SCAN_LIMIT) {
-      window.open(CHECKOUT_PAYMENT_LINK + '?app=bbqe', '_blank')
-      return
-    }
+    // TODO: Re-enable counter logic after testing
+    // if (!isSubscribed && scanCount >= FREE_SCAN_LIMIT) {
+    //   window.open(CHECKOUT_PAYMENT_LINK + '?app=bbqe', '_blank')
+    //   return
+    // }
     setLoading(true)
     const submittedUrl = url.trim()
     try {
@@ -166,7 +167,8 @@ function App() {
         findings: data.flags ?? [],
       })
       setScannedUrl(submittedUrl)
-      setScanCount((prev) => prev + 1)
+      // TODO: Re-enable counter increment after testing
+      // setScanCount((prev) => prev + 1)
       setUrl('')
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : 'Failed to process request'
@@ -181,10 +183,11 @@ function App() {
       alert('Please enter a WiFi network name (SSID)')
       return
     }
-    if (!isSubscribed && scanCount >= FREE_SCAN_LIMIT) {
-      window.open(CHECKOUT_PAYMENT_LINK + '?app=bbqe', '_blank')
-      return
-    }
+    // TODO: Re-enable counter logic after testing
+    // if (!isSubscribed && scanCount >= FREE_SCAN_LIMIT) {
+    //   window.open(CHECKOUT_PAYMENT_LINK + '?app=bbqe', '_blank')
+    //   return
+    // }
     setLoading(true)
     const submittedSSID = wifiSSID.trim()
     try {
@@ -215,7 +218,8 @@ function App() {
         ssid: submittedSSID,
         encryption: wifiEncryption,
       })
-      setScanCount((prev) => prev + 1)
+      // TODO: Re-enable counter increment after testing
+      // setScanCount((prev) => prev + 1)
       setWifiSSID('')
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : 'Failed to process request'
