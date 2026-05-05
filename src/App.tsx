@@ -153,10 +153,11 @@ function App() {
       })
       if (!response.ok) {
         const errorData = await response.json()
-        if (response.status === 403) {
-          window.open(CHECKOUT_PAYMENT_LINK + '?app=bbqe', '_blank')
-          return
-        }
+        // TODO: Re-enable 403 error handling after testing
+        // if (response.status === 403) {
+        //   window.open(CHECKOUT_PAYMENT_LINK + '?app=bbqe', '_blank')
+        //   return
+        // }
         throw new Error(errorData.error || 'Failed to scan link')
       }
       const data = await response.json()
@@ -202,10 +203,11 @@ function App() {
       })
       if (!response.ok) {
         const errorData = await response.json()
-        if (response.status === 403) {
-          window.open(CHECKOUT_PAYMENT_LINK + '?app=bbqe', '_blank')
-          return
-        }
+        // TODO: Re-enable 403 error handling after testing
+        // if (response.status === 403) {
+        //   window.open(CHECKOUT_PAYMENT_LINK + '?app=bbqe', '_blank')
+        //   return
+        // }
         throw new Error(errorData.error || 'Failed to analyze WiFi network')
       }
       const data = await response.json()
