@@ -188,13 +188,13 @@ function App() {
     setLoading(true)
     const submittedSSID = wifiSSID.trim()
     try {
-      const response = await fetch(`${BACKEND_URL}/api/bbqe/check-wifi`, {
+      const response = await fetch(`${BACKEND_URL}/api/bbqe/wifi-check`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           customerId: fpManager.getFingerprint(),
           ssid: submittedSSID,
-          encryption: wifiEncryption,
+          security: wifiEncryption,
         }),
       })
       if (!response.ok) {
@@ -207,11 +207,11 @@ function App() {
       }
       const data = await response.json()
       setWifiResult({
-        severity: data.threatLevel ?? 'LOW',
+        severity: data.riskLevel ?? 'LOW',
         score: data.score ?? 0,
-        description: data.summary ?? '',
-        vulnerabilities: data.vulnerabilities ?? [],
-        recommendations: data.recommendations ?? [],
+        description: data.recommendation ?? '',
+        vulnerabilities: data.flags ?? [],
+        recommendations: [],
         ssid: submittedSSID,
         encryption: wifiEncryption,
       })
@@ -356,7 +356,7 @@ function App() {
                 value={wifiEncryption}
                 onChange={(e) => setWifiEncryption(e.target.value)}
               >
-                <option value="Open">Open (No Encryption)</option>
+                <option value="OPEN">Open (No Encryption)</option>
                 <option value="WEP">WEP</option>
                 <option value="WPA">WPA</option>
                 <option value="WPA2">WPA2</option>
@@ -377,17 +377,9 @@ function App() {
                   <p className="bbqe-result-description">{wifiResult.description}</p>
                   {wifiResult.vulnerabilities && wifiResult.vulnerabilities.length > 0 && (
                     <>
-                      <p className="bbqe-result-subtitle">Vulnerabilities Found:</p>
+                      <p className="bbqe-result-subtitle">Findings:</p>
                       <ul className="bbqe-findings-list">
                         {wifiResult.vulnerabilities.map((vuln, i) => (<li key={i} className="bbqe-finding-item">{vuln}</li>))}
-                      </ul>
-                    </>
-                  )}
-                  {wifiResult.recommendations && wifiResult.recommendations.length > 0 && (
-                    <>
-                      <p className="bbqe-result-subtitle">Recommendations:</p>
-                      <ul className="bbqe-findings-list">
-                        {wifiResult.recommendations.map((rec, i) => (<li key={i} className="bbqe-finding-item">{rec}</li>))}
                       </ul>
                     </>
                   )}
