@@ -360,7 +360,7 @@ function App() {
           <div className="bbqe-tabs">
             <button className={`bbqe-tab-pill${activeTab === 'link-scanner' ? ' active' : ''}`} onClick={() => setActiveTab('link-scanner')}>Link Scanner</button>
             <button className={`bbqe-tab-pill${activeTab === 'wifi-check' ? ' active' : ''}`} onClick={() => setActiveTab('wifi-check')}>WiFi Check</button>
-            <button className={`bbqe-tab-pill${isSubscribed ? '' : ' bbqe-tab-locked'} ${activeTab === 'breach-scan' ? ' active' : ''}`} disabled={!isSubscribed} onClick={() => setActiveTab('breach-scan')}>Breach Scan {isSubscribed ? '' : '🔒'}</button>
+            <button className={`bbqe-tab-pill${isSubscribed ? '' : ' bbqe-tab-locked'} ${activeTab === 'breach-scan' ? ' active' : ''}`} disabled={!isSubscribed} onClick={() => isSubscribed && setActiveTab('breach-scan')}>Breach Scan {isSubscribed ? '' : '🔒'}</button>
           </div>
 
           {activeTab === 'link-scanner' && (
