@@ -30,6 +30,16 @@ interface WiFiResult {
   encryption: string
 }
 
+interface BreachResult {
+  severity: Severity
+  score: number
+  description: string
+  isBreach: boolean
+  breachCount: number
+  sources: string[]
+  email: string
+}
+
 function App() {
   const [showLanding, setShowLanding] = useState(true)
   const [isSubscribed, setIsSubscribed] = useState(() => {
@@ -70,6 +80,10 @@ function App() {
   const [wifiEncryption, setWifiEncryption] = useState('WPA2')
   const [wifiResult, setWifiResult] = useState<WiFiResult | null>(null)
   
+  // Breach Scan state
+  const [breachEmail, setBreachEmail] = useState('')
+  const [breachResult, setBreachResult] = useState<BreachResult | null>(null)
+  
   const [loading, setLoading] = useState(false)
   const fpManager = new FingerprintManager()
 
@@ -99,6 +113,7 @@ function App() {
       if (response.ok) {
         const data = await response.json()
         setScanCount(data.usageCount || 0)
+        setIsSubscribed(data.isPremium || data.isPaid || false)
       }
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : 'unknown'
@@ -229,12 +244,66 @@ function App() {
     }
   }
 
+  async function handleBreachCheck() {
+    if (!breachEmail.trim()) {
+      alert('Please enter an email address to check')
+      return
+    }
+    if (!isSubscribed) {
+      window.open(CHECKOUT_PAYMENT_LINK + '?app=bbqe', '_blank')
+      return
+    }
+    setLoading(true)
+    const submittedEmail = breachEmail.trim()
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/bbqe/check-threat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customerId: fpManager.getFingerprint(),
+          email: submittedEmail,
+        }),
+      })
+      if (!response.ok) {
+        const errorData = await response.json()
+        if (response.status === 403) {
+          window.open(CHECKOUT_PAYMENT_LINK + '?app=bbqe', '_blank')
+          return
+        }
+        throw new Error(errorData.error || 'Failed to check breaches')
+      }
+      const data = await response.json()
+      const breachCount = data.breachCount ?? 0
+      setBreachResult({
+        severity: breachCount === 0 ? 'LOW' : breachCount <= 2 ? 'MEDIUM' : breachCount <= 5 ? 'HIGH' : 'CRITICAL',
+        score: Math.max(0, 100 - (breachCount * 15)),
+        description: breachCount === 0 
+          ? 'Good news! This email was not found in known data breaches.'
+          : `This email was found in ${breachCount} data breach${breachCount !== 1 ? 'es' : ''}. Consider changing passwords on affected services.`,
+        isBreach: breachCount > 0,
+        breachCount: breachCount,
+        sources: data.sources ?? [],
+        email: submittedEmail,
+      })
+      setBreachEmail('')
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : 'Failed to process request'
+      alert(msg)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === 'Enter') handleScan()
   }
 
   function handleWifiKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === 'Enter') handleWifiCheck()
+  }
+
+  function handleBreachKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === 'Enter') handleBreachCheck()
   }
 
   function getSeverityClass(severity: Severity): string {
@@ -291,7 +360,7 @@ function App() {
           <div className="bbqe-tabs">
             <button className={`bbqe-tab-pill${activeTab === 'link-scanner' ? ' active' : ''}`} onClick={() => setActiveTab('link-scanner')}>Link Scanner</button>
             <button className={`bbqe-tab-pill${activeTab === 'wifi-check' ? ' active' : ''}`} onClick={() => setActiveTab('wifi-check')}>WiFi Check</button>
-            <button className="bbqe-tab-pill bbqe-tab-locked" disabled onClick={() => setActiveTab('breach-scan')}>Breach Scan 🔒</button>
+            <button className={`bbqe-tab-pill${isSubscribed ? '' : ' bbqe-tab-locked'} ${activeTab === 'breach-scan' ? ' active' : ''}`} disabled={!isSubscribed} onClick={() => setActiveTab('breach-scan')}>Breach Scan {isSubscribed ? '' : '🔒'}</button>
           </div>
 
           {activeTab === 'link-scanner' && (
@@ -388,7 +457,7 @@ function App() {
                     </>
                   )}
                   <div className="bbqe-how-it-works">
-                    <p className="bbqe-hiw-text">WiFi Check analyzes network encryption, known vulnerability patterns, and security best practices. Stronger encryption (WPA3) scores higher. Open networks and deprecated standards (WEP) are flagged as critical risks.</p>
+                    <p className="bbqe-hiw-text">WiFi Check analyzes network encryption, known vulnerability patterns, and security best practices. Stronger encryption (WPA3) scores higher. Open [...]
                   </div>
                   <div className="bbqe-card-footer">
                     <p className="bbqe-card-footer-line">The Shield (Front of the House) and The Bond (Back Home)</p>
@@ -405,7 +474,7 @@ function App() {
               )}
               {!wifiResult && (
                 <div className="bbqe-how-it-works">
-                  <p className="bbqe-hiw-text">Enter your WiFi network name and encryption type above. BBQE checks for weak or deprecated encryption standards, known vulnerability patterns in your network configuration, and provides hardening recommendations.</p>
+                  <p className="bbqe-hiw-text">Enter your WiFi network name and encryption type above. BBQE checks for weak or deprecated encryption standards, known vulnerability patterns in you[...]
                 </div>
               )}
             </div>
@@ -413,14 +482,73 @@ function App() {
 
           {activeTab === 'breach-scan' && (
             <div className="bbqe-tab-content">
-              <div className="bbqe-locked-content">
-                <p className="bbqe-locked-badge">🔒 PitBoss Feature</p>
-                <p className="bbqe-locked-text">Breach Scan checks your email addresses against known data breaches and credential leaks.</p>
-                <a href={CHECKOUT_PAYMENT_LINK + '?app=bbqe'} target="_blank" rel="noopener noreferrer" className="bbqe-upgrade-link">Upgrade to PitBoss to unlock</a>
-              </div>
-              <div className="bbqe-how-it-works">
-                <p className="bbqe-hiw-text">Breach Scan cross-references your email against hundreds of known breach databases. Available on PitBoss.</p>
-              </div>
+              {isSubscribed ? (
+                <>
+                  <h2 className="bbqe-section-title">Check for Breaches</h2>
+                  <p className="bbqe-section-sub">Enter an email address to check if it appears in known data breaches or leaked databases.</p>
+                  <input 
+                    type="email" 
+                    className="bbqe-input" 
+                    placeholder="your@email.com" 
+                    value={breachEmail} 
+                    onChange={(e) => setBreachEmail(e.target.value)} 
+                    onKeyDown={handleBreachKeyDown}
+                  />
+                  <button className={`bbqe-scan-btn${loading ? ' disabled' : ''}`} onClick={handleBreachCheck} disabled={loading}>
+                    {loading ? 'Checking...' : 'Check Breaches'}
+                  </button>
+                  {breachResult && (
+                    <div className="bbqe-result-box">
+                      <p className="bbqe-scanned-label">Checked Email:</p>
+                      <p className="bbqe-scanned-url">"{breachResult.email}"</p>
+                      <hr className="bbqe-divider" />
+                      <div className="bbqe-severity-row">
+                        <span className={`bbqe-severity-badge ${getSeverityClass(breachResult.severity)}`}>{breachResult.severity}</span>
+                        <span className="bbqe-score">Score {breachResult.score}/100</span>
+                      </div>
+                      <p className="bbqe-result-description">{breachResult.description}</p>
+                      {breachResult.isBreach && breachResult.sources && breachResult.sources.length > 0 && (
+                        <>
+                          <p className="bbqe-result-subtitle">Found in breaches:</p>
+                          <ul className="bbqe-findings-list">
+                            {breachResult.sources.map((source, i) => (<li key={i} className="bbqe-finding-item">{source}</li>))}
+                          </ul>
+                        </>
+                      )}
+                      <div className="bbqe-how-it-works">
+                        <p className="bbqe-hiw-text">Breach Scan checks your email against hundreds of known data breach databases. If found, we recommend changing passwords on potentially affected services and enabling two-factor authentication.</p>
+                      </div>
+                      <div className="bbqe-card-footer">
+                        <p className="bbqe-card-footer-line">The Shield (Front of the House) and The Bond (Back Home)</p>
+                        <p className="bbqe-card-footer-line">Loyalty means only presenting a party's shortcomings to the party — never to the world.</p>
+                        <div className="bbqe-card-footer-links">
+                          <a href={PRIVACY_POLICY_URL} target="_blank" rel="noopener noreferrer" className="bbqe-card-footer-link">Privacy Policy</a>
+                          <span className="bbqe-card-footer-sep">·</span>
+                          <a href={`${SAUCE_HOME}/terms`} target="_blank" rel="noopener noreferrer" className="bbqe-card-footer-link">Terms of Use</a>
+                        </div>
+                        <p className="bbqe-card-footer-line bbqe-card-footer-brought">Brought to you by sauc-e</p>
+                        <p className="bbqe-card-footer-line bbqe-card-footer-prepared">Prepared by Rilie Ravena Rivers</p>
+                      </div>
+                    </div>
+                  )}
+                  {!breachResult && (
+                    <div className="bbqe-how-it-works">
+                      <p className="bbqe-hiw-text">Enter your email address above. Breach Scan cross-references against hundreds of known breach databases to detect if your email has been compromised. This feature is available to PitBoss subscribers.</p>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <>
+                  <div className="bbqe-locked-content">
+                    <p className="bbqe-locked-badge">🔒 PitBoss Feature</p>
+                    <p className="bbqe-locked-text">Breach Scan checks your email addresses against known data breaches and credential leaks.</p>
+                    <a href={CHECKOUT_PAYMENT_LINK + '?app=bbqe'} target="_blank" rel="noopener noreferrer" className="bbqe-upgrade-link">Upgrade to PitBoss to unlock</a>
+                  </div>
+                  <div className="bbqe-how-it-works">
+                    <p className="bbqe-hiw-text">Breach Scan cross-references your email against hundreds of known breach databases. Available on PitBoss.</p>
+                  </div>
+                </>
+              )}
             </div>
           )}
 
