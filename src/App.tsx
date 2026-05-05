@@ -261,7 +261,7 @@ function App() {
                     </ul>
                   )}
                   <div className="bbqe-how-it-works">
-                    <p className="bbqe-hiw-text">BBQE checks the link against threat intelligence, domain reputation, and known phishing patterns. A score closer to 0 means safer. 100 means criti[...]
+                    <p className="bbqe-hiw-text">BBQE checks the link against threat intelligence, domain reputation, and known phishing patterns. A score closer to 0 means safer. 100 means critical risk.</p>
                   </div>
                   <div className="bbqe-card-footer">
                     <p className="bbqe-card-footer-line">The Shield (Front of the House) and The Bond (Back Home)</p>
@@ -278,7 +278,7 @@ function App() {
               )}
               {!scanResult && (
                 <div className="bbqe-how-it-works">
-                  <p className="bbqe-hiw-text">Paste any suspicious URL above. BBQE checks for phishing domains, malware redirects, lookalike URLs, and known threat patterns — returning a sever[...]
+                  <p className="bbqe-hiw-text">Paste any suspicious URL above. BBQE checks for phishing domains, malware redirects, lookalike URLs, and known threat patterns — returning a severity score so you know exactly what you're dealing with.</p>
                 </div>
               )}
             </div>
@@ -292,7 +292,7 @@ function App() {
                 <a href={CHECKOUT_PAYMENT_LINK + '?app=bbqe'} target="_blank" rel="noopener noreferrer" className="bbqe-upgrade-link">Upgrade to Premium to unlock</a>
               </div>
               <div className="bbqe-how-it-works">
-                <p className="bbqe-hiw-text">WiFi Check analyzes the network you're connected to — checking for open ports, weak encryption, ARP spoofing indicators, and known rogue hotspot pat[...]
+                <p className="bbqe-hiw-text">WiFi Check analyzes the network you're connected to — checking for open ports, weak encryption, ARP spoofing indicators, and known rogue hotspot patterns. Available on Premium.</p>
               </div>
             </div>
           )}
