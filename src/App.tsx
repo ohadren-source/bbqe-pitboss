@@ -20,6 +20,16 @@ interface ScanResult {
   findings: string[]
 }
 
+interface WiFiResult {
+  severity: Severity
+  score: number
+  description: string
+  vulnerabilities: string[]
+  recommendations: string[]
+  ssid: string
+  encryption: string
+}
+
 function App() {
   const [showLanding, setShowLanding] = useState(true)
   const [isSubscribed, setIsSubscribed] = useState(() => {
@@ -54,6 +64,12 @@ function App() {
   const [url, setUrl] = useState('')
   const [scanResult, setScanResult] = useState<ScanResult | null>(null)
   const [scannedUrl, setScannedUrl] = useState('')
+  
+  // WiFi Check state
+  const [wifiSSID, setWifiSSID] = useState('')
+  const [wifiEncryption, setWifiEncryption] = useState('WPA2')
+  const [wifiResult, setWifiResult] = useState<WiFiResult | null>(null)
+  
   const [loading, setLoading] = useState(false)
   const fpManager = new FingerprintManager()
 
@@ -119,10 +135,11 @@ function App() {
       alert('Please enter a URL to scan')
       return
     }
-    if (!isSubscribed && scanCount >= FREE_SCAN_LIMIT) {
-      window.open(CHECKOUT_PAYMENT_LINK + '?app=bbqe', '_blank')
-      return
-    }
+    // TODO: Re-enable counter logic after testing
+    // if (!isSubscribed && scanCount >= FREE_SCAN_LIMIT) {
+    //   window.open(CHECKOUT_PAYMENT_LINK + '?app=bbqe', '_blank')
+    //   return
+    // }
     setLoading(true)
     const submittedUrl = url.trim()
     try {
@@ -150,8 +167,60 @@ function App() {
         findings: data.flags ?? [],
       })
       setScannedUrl(submittedUrl)
-      setScanCount((prev) => prev + 1)
+      // TODO: Re-enable counter increment after testing
+      // setScanCount((prev) => prev + 1)
       setUrl('')
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : 'Failed to process request'
+      alert(msg)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  async function handleWifiCheck() {
+    if (!wifiSSID.trim()) {
+      alert('Please enter a WiFi network name (SSID)')
+      return
+    }
+    // TODO: Re-enable counter logic after testing
+    // if (!isSubscribed && scanCount >= FREE_SCAN_LIMIT) {
+    //   window.open(CHECKOUT_PAYMENT_LINK + '?app=bbqe', '_blank')
+    //   return
+    // }
+    setLoading(true)
+    const submittedSSID = wifiSSID.trim()
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/bbqe/wifi-check`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customerId: fpManager.getFingerprint(),
+          ssid: submittedSSID,
+          security: wifiEncryption,
+        }),
+      })
+      if (!response.ok) {
+        const errorData = await response.json()
+        if (response.status === 403) {
+          window.open(CHECKOUT_PAYMENT_LINK + '?app=bbqe', '_blank')
+          return
+        }
+        throw new Error(errorData.error || 'Failed to analyze WiFi network')
+      }
+      const data = await response.json()
+      setWifiResult({
+        severity: data.riskLevel ?? 'LOW',
+        score: data.score ?? 0,
+        description: data.recommendation ?? '',
+        vulnerabilities: data.flags ?? [],
+        recommendations: [],
+        ssid: submittedSSID,
+        encryption: wifiEncryption,
+      })
+      // TODO: Re-enable counter increment after testing
+      // setScanCount((prev) => prev + 1)
+      setWifiSSID('')
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : 'Failed to process request'
       alert(msg)
@@ -162,6 +231,10 @@ function App() {
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === 'Enter') handleScan()
+  }
+
+  function handleWifiKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === 'Enter') handleWifiCheck()
   }
 
   function getSeverityClass(severity: Severity): string {
@@ -217,7 +290,7 @@ function App() {
         <main className="bbqe-content">
           <div className="bbqe-tabs">
             <button className={`bbqe-tab-pill${activeTab === 'link-scanner' ? ' active' : ''}`} onClick={() => setActiveTab('link-scanner')}>Link Scanner</button>
-            <button className="bbqe-tab-pill bbqe-tab-locked" disabled onClick={() => setActiveTab('wifi-check')}>WiFi Check 🔒</button>
+            <button className={`bbqe-tab-pill${activeTab === 'wifi-check' ? ' active' : ''}`} onClick={() => setActiveTab('wifi-check')}>WiFi Check</button>
             <button className="bbqe-tab-pill bbqe-tab-locked" disabled onClick={() => setActiveTab('breach-scan')}>Breach Scan 🔒</button>
           </div>
 
@@ -245,7 +318,8 @@ function App() {
                     </ul>
                   )}
                   <div className="bbqe-how-it-works">
-                    <p className="bbqe-hiw-text">BBQE checks the link against threat intelligence, domain reputation, and known phishing patterns. A score closer to 0 means safer. 100 means critical risk.</p>
+                    <p className="bbqe-hiw-text">BBQE checks the link against threat intelligence, domain reputation, and known phishing patterns. A score closer to 0 means safer. 100 means criti[...]
+                    </p>
                   </div>
                   <div className="bbqe-card-footer">
                     <p className="bbqe-card-footer-line">The Shield (Front of the House) and The Bond (Back Home)</p>
@@ -262,7 +336,8 @@ function App() {
               )}
               {!scanResult && (
                 <div className="bbqe-how-it-works">
-                  <p className="bbqe-hiw-text">Paste any suspicious URL above. BBQE checks for phishing domains, malware redirects, lookalike URLs, and known threat patterns — returning a severity score so you know exactly what you're dealing with.</p>
+                  <p className="bbqe-hiw-text">Paste any suspicious URL above. BBQE checks for phishing domains, malware redirects, lookalike URLs, and known threat patterns — returning a sever[...]
+                  </p>
                 </div>
               )}
             </div>
@@ -270,14 +345,69 @@ function App() {
 
           {activeTab === 'wifi-check' && (
             <div className="bbqe-tab-content">
-              <div className="bbqe-locked-content">
-                <p className="bbqe-locked-badge">🔒 Premium Feature</p>
-                <p className="bbqe-locked-text">WiFi Check scans your current network for vulnerabilities, rogue access points, and man-in-the-middle risks.</p>
-                <a href={CHECKOUT_PAYMENT_LINK + '?app=bbqe'} target="_blank" rel="noopener noreferrer" className="bbqe-upgrade-link">Upgrade to Premium to unlock</a>
-              </div>
-              <div className="bbqe-how-it-works">
-                <p className="bbqe-hiw-text">WiFi Check analyzes the network you're connected to — checking for open ports, weak encryption, ARP spoofing indicators, and known rogue hotspot patterns. Available on Premium.</p>
-              </div>
+              <h2 className="bbqe-section-title">Analyze WiFi Network</h2>
+              <p className="bbqe-section-sub">Enter your WiFi network details to check for vulnerabilities, weak encryption, and security risks.</p>
+              <input 
+                type="text" 
+                className="bbqe-input" 
+                placeholder="WiFi Network Name (SSID)" 
+                value={wifiSSID} 
+                onChange={(e) => setWifiSSID(e.target.value)} 
+                onKeyDown={handleWifiKeyDown}
+              />
+              <select 
+                className="bbqe-input" 
+                value={wifiEncryption}
+                onChange={(e) => setWifiEncryption(e.target.value)}
+              >
+                <option value="OPEN">Open (No Encryption)</option>
+                <option value="WEP">WEP</option>
+                <option value="WPA">WPA</option>
+                <option value="WPA2">WPA2</option>
+                <option value="WPA3">WPA3</option>
+              </select>
+              <button className={`bbqe-scan-btn${loading ? ' disabled' : ''}`} onClick={handleWifiCheck} disabled={loading}>
+                {loading ? 'Analyzing...' : 'Analyze Network'}
+              </button>
+              {wifiResult && (
+                <div className="bbqe-result-box">
+                  <p className="bbqe-scanned-label">Analyzed Network:</p>
+                  <p className="bbqe-scanned-url">"{wifiResult.ssid}" ({wifiResult.encryption})</p>
+                  <hr className="bbqe-divider" />
+                  <div className="bbqe-severity-row">
+                    <span className={`bbqe-severity-badge ${getSeverityClass(wifiResult.severity)}`}>{wifiResult.severity}</span>
+                    <span className="bbqe-score">Score {wifiResult.score}/100</span>
+                  </div>
+                  <p className="bbqe-result-description">{wifiResult.description}</p>
+                  {wifiResult.vulnerabilities && wifiResult.vulnerabilities.length > 0 && (
+                    <>
+                      <p className="bbqe-result-subtitle">Findings:</p>
+                      <ul className="bbqe-findings-list">
+                        {wifiResult.vulnerabilities.map((vuln, i) => (<li key={i} className="bbqe-finding-item">{vuln}</li>))}
+                      </ul>
+                    </>
+                  )}
+                  <div className="bbqe-how-it-works">
+                    <p className="bbqe-hiw-text">WiFi Check analyzes network encryption, known vulnerability patterns, and security best practices. Stronger encryption (WPA3) scores higher. Open networks and deprecated standards (WEP) are flagged as critical risks.</p>
+                  </div>
+                  <div className="bbqe-card-footer">
+                    <p className="bbqe-card-footer-line">The Shield (Front of the House) and The Bond (Back Home)</p>
+                    <p className="bbqe-card-footer-line">Loyalty means only presenting a party's shortcomings to the party — never to the world.</p>
+                    <div className="bbqe-card-footer-links">
+                      <a href={PRIVACY_POLICY_URL} target="_blank" rel="noopener noreferrer" className="bbqe-card-footer-link">Privacy Policy</a>
+                      <span className="bbqe-card-footer-sep">·</span>
+                      <a href={`${SAUCE_HOME}/terms`} target="_blank" rel="noopener noreferrer" className="bbqe-card-footer-link">Terms of Use</a>
+                    </div>
+                    <p className="bbqe-card-footer-line bbqe-card-footer-brought">Brought to you by sauc-e</p>
+                    <p className="bbqe-card-footer-line bbqe-card-footer-prepared">Prepared by Rilie Ravena Rivers</p>
+                  </div>
+                </div>
+              )}
+              {!wifiResult && (
+                <div className="bbqe-how-it-works">
+                  <p className="bbqe-hiw-text">Enter your WiFi network name and encryption type above. BBQE checks for weak or deprecated encryption standards, known vulnerability patterns in your network configuration, and provides hardening recommendations.</p>
+                </div>
+              )}
             </div>
           )}
 
@@ -296,8 +426,8 @@ function App() {
 
           <div className="bbqe-tiers-table">
             <h2 className="bbqe-section-title">Plans</h2>
-            <div className="bbqe-tier-row"><div className="bbqe-tier-name">Free</div><div className="bbqe-tier-desc">Link Scanner (5 scans)</div></div>
-            <div className="bbqe-tier-row"><div className="bbqe-tier-name bbqe-tier-premium">Premium</div><div className="bbqe-tier-desc">+ WiFi Check (unlimited)</div></div>
+            <div className="bbqe-tier-row"><div className="bbqe-tier-name">Free</div><div className="bbqe-tier-desc">Link Scanner + WiFi Check (9 total scans)</div></div>
+            <div className="bbqe-tier-row"><div className="bbqe-tier-name bbqe-tier-premium">Premium</div><div className="bbqe-tier-desc">+ Unlimited scans</div></div>
             <div className="bbqe-tier-row"><div className="bbqe-tier-name bbqe-tier-pitboss">PitBoss</div><div className="bbqe-tier-desc">+ Breach Scanner (unlimited)</div></div>
           </div>
         </main>
