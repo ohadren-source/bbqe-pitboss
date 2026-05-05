@@ -457,7 +457,7 @@ function App() {
                     </>
                   )}
                   <div className="bbqe-how-it-works">
-                    <p className="bbqe-hiw-text">WiFi Check analyzes network encryption, known vulnerability patterns, and security best practices. Stronger encryption (WPA3) scores higher. Open [...]
+                    <p className="bbqe-hiw-text">WiFi Check analyzes network encryption, known vulnerability patterns, and security best practices. Stronger encryption (WPA3) scores higher. Open networks are most vulnerable.</p>
                   </div>
                   <div className="bbqe-card-footer">
                     <p className="bbqe-card-footer-line">The Shield (Front of the House) and The Bond (Back Home)</p>
@@ -474,7 +474,7 @@ function App() {
               )}
               {!wifiResult && (
                 <div className="bbqe-how-it-works">
-                  <p className="bbqe-hiw-text">Enter your WiFi network name and encryption type above. BBQE checks for weak or deprecated encryption standards, known vulnerability patterns in you[...]
+                  <p className="bbqe-hiw-text">Enter your WiFi network name and encryption type above. BBQE checks for weak or deprecated encryption standards, known vulnerability patterns in your network configuration, and security best practices.</p>
                 </div>
               )}
             </div>
@@ -533,7 +533,7 @@ function App() {
                   )}
                   {!breachResult && (
                     <div className="bbqe-how-it-works">
-                      <p className="bbqe-hiw-text">Enter your email address above. Breach Scan cross-references against hundreds of known breach databases to detect if your email has been compromised. This feature is available to PitBoss subscribers.</p>
+                      <p className="bbqe-hiw-text">Enter your email address above. Breach Scan cross-references against hundreds of known breach databases to detect if your email has been compromised in a data leak.</p>
                     </div>
                   )}
                 </>
