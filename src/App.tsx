@@ -55,9 +55,10 @@ function App() {
   const [scanResult, setScanResult] = useState<ScanResult | null>(null)
   const [scannedUrl, setScannedUrl] = useState('')
   const [loading, setLoading] = useState(false)
+  const [subscriptionTier, setSubscriptionTier] = useState<string | null>(null)
   const fpManager = new FingerprintManager()
 
-  const freeLeft = Math.max(0, FREE_SCAN_LIMIT - scanCount)
+  const freeLeft = (isSubscribed && subscriptionTier) ? 999999 : Math.max(0, FREE_SCAN_LIMIT - scanCount)
 
   useEffect(() => {
     syncUsageCount()
@@ -83,6 +84,7 @@ function App() {
       if (response.ok) {
         const data = await response.json()
         setScanCount(data.usageCount || 0)
+        setSubscriptionTier(data.subscriptionTier || null)
       }
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : 'unknown'
@@ -104,6 +106,7 @@ function App() {
       if (response.ok) {
         const data = await response.json()
         setScanCount(data.usageCount || 0)
+        setSubscriptionTier(data.subscriptionTier || null)
         setIsSubscribed(true)
         // Payment verification succeeded - user now has premium access
       }
@@ -119,7 +122,8 @@ function App() {
       alert('Please enter a URL to scan')
       return
     }
-    if (!isSubscribed && scanCount >= FREE_SCAN_LIMIT) {
+    const hasValidSubscription = isSubscribed && subscriptionTier
+    if (!hasValidSubscription && scanCount >= FREE_SCAN_LIMIT) {
       window.open(CHECKOUT_PAYMENT_LINK + '?app=bbqe', '_blank')
       return
     }
@@ -201,7 +205,7 @@ function App() {
           <p className="bbqe-philosophy">Safety = Quality / Quantity</p>
         </header>
 
-        {!isSubscribed && (
+        {!isSubscribed || !subscriptionTier ? (
           <div className="premium-section">
             <a
               href={CHECKOUT_PAYMENT_LINK + '?app=bbqe'}
@@ -212,13 +216,25 @@ function App() {
               {freeLeft > 0 ? `Free · ${freeLeft} scans left` : 'Upgrade to Premium · $0.99/mo'}
             </a>
           </div>
-        )}
+        ) : null}
 
         <main className="bbqe-content">
           <div className="bbqe-tabs">
             <button className={`bbqe-tab-pill${activeTab === 'link-scanner' ? ' active' : ''}`} onClick={() => setActiveTab('link-scanner')}>Link Scanner</button>
-            <button className="bbqe-tab-pill bbqe-tab-locked" disabled onClick={() => setActiveTab('wifi-check')}>WiFi Check 🔒</button>
-            <button className="bbqe-tab-pill bbqe-tab-locked" disabled onClick={() => setActiveTab('breach-scan')}>Breach Scan 🔒</button>
+            <button
+              className={`bbqe-tab-pill${activeTab === 'wifi-check' ? ' active' : ''}${subscriptionTier !== 'bbqe-premium' && subscriptionTier !== 'bbqe-pitboss' ? ' bbqe-tab-locked' : ''}`}
+              disabled={subscriptionTier !== 'bbqe-premium' && subscriptionTier !== 'bbqe-pitboss'}
+              onClick={() => setActiveTab('wifi-check')}
+            >
+              WiFi Check {subscriptionTier !== 'bbqe-premium' && subscriptionTier !== 'bbqe-pitboss' ? '🔒' : ''}
+            </button>
+            <button
+              className={`bbqe-tab-pill${activeTab === 'breach-scan' ? ' active' : ''}${subscriptionTier !== 'bbqe-pitboss' ? ' bbqe-tab-locked' : ''}`}
+              disabled={subscriptionTier !== 'bbqe-pitboss'}
+              onClick={() => setActiveTab('breach-scan')}
+            >
+              Breach Scan {subscriptionTier !== 'bbqe-pitboss' ? '🔒' : ''}
+            </button>
           </div>
 
           {activeTab === 'link-scanner' && (
@@ -306,14 +322,14 @@ function App() {
           <img src="/bbqe_uvt.png" alt="BBQE — Us vs Them" className="bbqe-marketing-img bbqe-uvt-img" />
         </section>
 
-        {!isSubscribed && (
+        {!isSubscribed || !subscriptionTier ? (
           <section className="bbqe-cta-section">
             <h2 className="bbqe-cta-title">What Mobile Security Can Actually Do</h2>
             <p className="bbqe-cta-subtitle">Education, not fear. $0.99/mo or $19.99/yr.</p>
             <p className="bbqe-cta-tagline">We've got your back so you can face front.</p>
             <a href={CHECKOUT_PAYMENT_LINK + '?app=bbqe'} target="_blank" rel="noopener noreferrer" className="bbqe-cta-btn">Subscribe at sauc-e.com</a>
           </section>
-        )}
+        ) : null}
 
         <div className="bbqe-legal">
           <a href={`${SAUCE_HOME}/terms`} target="_blank" rel="noopener noreferrer" className="bbqe-legal-link">Terms of Service</a>
