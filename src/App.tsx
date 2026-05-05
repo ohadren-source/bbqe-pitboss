@@ -312,7 +312,7 @@ function App() {
 
           <div className="bbqe-tiers-table">
             <h2 className="bbqe-section-title">Plans</h2>
-            <div className="bbqe-tier-row"><div className="bbqe-tier-name">Free</div><div className="bbqe-tier-desc">Link Scanner (5 scans)</div></div>
+            <div className="bbqe-tier-row"><div className="bbqe-tier-name">Free</div><div className="bbqe-tier-desc">Link Scanner (9 scans)</div></div>
             <div className="bbqe-tier-row"><div className="bbqe-tier-name bbqe-tier-premium">Premium</div><div className="bbqe-tier-desc">+ WiFi Check (unlimited)</div></div>
             <div className="bbqe-tier-row"><div className="bbqe-tier-name bbqe-tier-pitboss">PitBoss</div><div className="bbqe-tier-desc">+ Breach Scanner (unlimited)</div></div>
           </div>
