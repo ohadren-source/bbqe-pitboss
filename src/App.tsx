@@ -282,12 +282,16 @@ function App() {
         }),
       })
       if (!response.ok) {
-        const errorData = await response.json()
         if (response.status === 403) {
           window.open(CHECKOUT_PAYMENT_LINK + '?app=bbqe', '_blank')
           return
         }
-        throw new Error(errorData.error || 'Failed to scan email for breaches')
+        let errorMsg = 'Failed to scan email for breaches'
+        try {
+          const errorData = await response.json()
+          errorMsg = errorData.error || errorMsg
+        } catch { /* response was not JSON (e.g. HTML error page) */ }
+        throw new Error(errorMsg)
       }
       const data = await response.json()
       setBreachResult({
@@ -592,3 +596,4 @@ function App() {
 }
 
 export default App
+
