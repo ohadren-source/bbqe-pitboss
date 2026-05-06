@@ -30,16 +30,6 @@ interface WiFiResult {
   encryption: string
 }
 
-interface BreachResult {
-  severity: Severity
-  score: number
-  description: string
-  isBreach: boolean
-  breachCount: number
-  sources: string[]
-  email: string
-}
-
 function App() {
   const [showLanding, setShowLanding] = useState(true)
   const [isSubscribed, setIsSubscribed] = useState(() => {
@@ -82,7 +72,7 @@ function App() {
 
   // Breach Scan state
   const [breachEmail, setBreachEmail] = useState('')
-  const [breachResult, setBreachResult] = useState<BreachResult | null>(null)
+  const [breachResult, setBreachResult] = useState<ScanResult | null>(null)
   const [breachScannedEmail, setBreachScannedEmail] = useState('')
   
   const [loading, setLoading] = useState(false)
@@ -116,7 +106,6 @@ function App() {
       if (response.ok) {
         const data = await response.json()
         setScanCount(data.usageCount || 0)
-        setIsSubscribed(data.isPremium || data.isPaid || false)
       }
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : 'unknown'
@@ -506,3 +495,100 @@ function App() {
 
           {activeTab === 'breach-scan' && (
             <div className="bbqe-tab-content">
+              <h2 className="bbqe-section-title">Breach Scan</h2>
+              <p className="bbqe-section-sub">Enter an email address to check if it has appeared in known data breaches or credential leaks.</p>
+              <input
+                type="email"
+                className="bbqe-input"
+                placeholder="you@example.com"
+                value={breachEmail}
+                onChange={(e) => setBreachEmail(e.target.value)}
+                onKeyDown={handleBreachKeyDown}
+              />
+              <button className={`bbqe-scan-btn${loading ? ' disabled' : ''}`} onClick={handleBreachScan} disabled={loading}>
+                {loading ? 'Scanning...' : 'Scan Email'}
+              </button>
+              {breachResult && (
+                <div className="bbqe-result-box">
+                  <p className="bbqe-scanned-label">Scanned:</p>
+                  <p className="bbqe-scanned-url">"{breachScannedEmail}"</p>
+                  <hr className="bbqe-divider" />
+                  <div className="bbqe-severity-row">
+                    <span className={`bbqe-severity-badge ${getSeverityClass(breachResult.severity)}`}>{breachResult.severity}</span>
+                    <span className="bbqe-score">Score {breachResult.score}/100</span>
+                  </div>
+                  <p className="bbqe-result-description">{breachResult.description}</p>
+                  {breachResult.findings && breachResult.findings.length > 0 && (
+                    <>
+                      <p className="bbqe-result-subtitle">Findings:</p>
+                      <ul className="bbqe-findings-list">
+                        {breachResult.findings.map((finding, i) => (<li key={i} className="bbqe-finding-item">{finding}</li>))}
+                      </ul>
+                    </>
+                  )}
+                  <div className="bbqe-how-it-works">
+                    <p className="bbqe-hiw-text">Breach Scan cross-references your email against hundreds of known breach databases and credential leak sources. A higher score means more exposure.</p>
+                  </div>
+                  <div className="bbqe-card-footer">
+                    <p className="bbqe-card-footer-line">The Shield (Front of the House) and The Bond (Back Home)</p>
+                    <p className="bbqe-card-footer-line">Loyalty means only presenting a party's shortcomings to the party — never to the world.</p>
+                    <div className="bbqe-card-footer-links">
+                      <a href={PRIVACY_POLICY_URL} target="_blank" rel="noopener noreferrer" className="bbqe-card-footer-link">Privacy Policy</a>
+                      <span className="bbqe-card-footer-sep">·</span>
+                      <a href={`${SAUCE_HOME}/terms`} target="_blank" rel="noopener noreferrer" className="bbqe-card-footer-link">Terms of Use</a>
+                    </div>
+                    <p className="bbqe-card-footer-line bbqe-card-footer-brought">Brought to you by sauc-e</p>
+                    <p className="bbqe-card-footer-line bbqe-card-footer-prepared">Prepared by Rilie Ravena Rivers</p>
+                  </div>
+                </div>
+              )}
+              {!breachResult && (
+                <div className="bbqe-how-it-works">
+                  <p className="bbqe-hiw-text">Enter any email address above. BBQE checks it against hundreds of known breach databases and credential leak sources — returning a severity rating and a list of affected services.</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          <div className="bbqe-tiers-table">
+            <h2 className="bbqe-section-title">Plans</h2>
+            <div className="bbqe-tier-row"><div className="bbqe-tier-name">Free</div><div className="bbqe-tier-desc">Link Scanner + WiFi Check + Breach Scan (9 total scans)</div></div>
+            <div className="bbqe-tier-row"><div className="bbqe-tier-name bbqe-tier-premium">Premium</div><div className="bbqe-tier-desc">+ Unlimited scans</div></div>
+            <div className="bbqe-tier-row"><div className="bbqe-tier-name bbqe-tier-pitboss">PitBoss</div><div className="bbqe-tier-desc">Breach Scanner (unlimited)</div></div>
+          </div>
+        </main>
+
+        <section className="bbqe-marketing">
+          <img src="/bbqe_uvt.png" alt="BBQE — Us vs Them" className="bbqe-marketing-img bbqe-uvt-img" />
+        </section>
+
+        {!isSubscribed && (
+          <section className="bbqe-cta-section">
+            <h2 className="bbqe-cta-title">What Mobile Security Can Actually Do</h2>
+            <p className="bbqe-cta-subtitle">Education, not fear. $0.99/mo or $19.99/yr.</p>
+            <p className="bbqe-cta-tagline">We've got your back so you can face front.</p>
+            <a href={CHECKOUT_PAYMENT_LINK + '?app=bbqe'} target="_blank" rel="noopener noreferrer" className="bbqe-cta-btn">Subscribe at sauc-e.com</a>
+          </section>
+        )}
+
+        <div className="bbqe-legal">
+          <a href={`${SAUCE_HOME}/terms`} target="_blank" rel="noopener noreferrer" className="bbqe-legal-link">Terms of Service</a>
+          <span className="bbqe-legal-sep">·</span>
+          <a href={PRIVACY_POLICY_URL} target="_blank" rel="noopener noreferrer" className="bbqe-legal-link">Privacy Policy</a>
+          <span className="bbqe-legal-sep">·</span>
+          <a href={`${SAUCE_HOME}/support`} target="_blank" rel="noopener noreferrer" className="bbqe-legal-link">Support</a>
+        </div>
+
+        <footer className="bbqe-footer">
+          <a href={SAUCE_HOME} target="_blank" rel="noopener noreferrer" className="bbqe-footer-brand">sauc-e.com</a>
+          <p className="bbqe-footer-tagline">HOME of all of our delicious APPS</p>
+          <p className="bbqe-footer-small">BBQE is for Safety</p>
+          <p className="bbqe-footer-small">RELISH (Feelings) · CATSUP (Learning)</p>
+          <p className="bbqe-footer-tiny">© 2026 3_6_NIFE.pi · 36Nife@gmail.com</p>
+        </footer>
+      </div>
+    </div>
+  )
+}
+
+export default App
