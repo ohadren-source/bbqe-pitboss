@@ -82,12 +82,8 @@ function App() {
 
   // Breach Scan state
   const [breachEmail, setBreachEmail] = useState('')
-  const [breachResult, setBreachResult] = useState<ScanResult | null>(null)
-  const [breachScannedEmail, setBreachScannedEmail] = useState('')
-  
-  // Breach Scan state
-  const [breachEmail, setBreachEmail] = useState('')
   const [breachResult, setBreachResult] = useState<BreachResult | null>(null)
+  const [breachScannedEmail, setBreachScannedEmail] = useState('')
   
   const [loading, setLoading] = useState(false)
   const fpManager = new FingerprintManager()
@@ -276,19 +272,32 @@ function App() {
     }
   }
 
+<<<<<<< HEAD
   async function handleBreachCheck() {
     if (!breachEmail.trim()) {
       alert('Please enter an email address to check')
       return
     }
     if (!isSubscribed) {
+=======
+  async function handleBreachScan() {
+    if (!breachEmail.trim()) {
+      alert('Please enter an email address to scan')
+      return
+    }
+    if (!isSubscribed && scanCount >= FREE_SCAN_LIMIT) {
+>>>>>>> origin/railway/code-change-ewnmeQ
       window.open(CHECKOUT_PAYMENT_LINK + '?app=bbqe', '_blank')
       return
     }
     setLoading(true)
     const submittedEmail = breachEmail.trim()
     try {
+<<<<<<< HEAD
       const response = await fetch(`${BACKEND_URL}/api/bbqe/check-threat`, {
+=======
+      const response = await fetch(`${BACKEND_URL}/api/bbqe/breach-scan`, {
+>>>>>>> origin/railway/code-change-ewnmeQ
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -302,6 +311,7 @@ function App() {
           window.open(CHECKOUT_PAYMENT_LINK + '?app=bbqe', '_blank')
           return
         }
+<<<<<<< HEAD
         throw new Error(errorData.error || 'Failed to check breaches')
       }
       const data = await response.json()
@@ -317,6 +327,19 @@ function App() {
         sources: data.sources ?? [],
         email: submittedEmail,
       })
+=======
+        throw new Error(errorData.error || 'Failed to scan email for breaches')
+      }
+      const data = await response.json()
+      setBreachResult({
+        severity: data.threatLevel ?? 'LOW',
+        score: data.score ?? 0,
+        description: data.summary ?? '',
+        findings: data.flags ?? [],
+      })
+      setBreachScannedEmail(submittedEmail)
+      setScanCount((prev) => prev + 1)
+>>>>>>> origin/railway/code-change-ewnmeQ
       setBreachEmail('')
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : 'Failed to process request'
@@ -335,7 +358,11 @@ function App() {
   }
 
   function handleBreachKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+<<<<<<< HEAD
     if (e.key === 'Enter') handleBreachCheck()
+=======
+    if (e.key === 'Enter') handleBreachScan()
+>>>>>>> origin/railway/code-change-ewnmeQ
   }
 
   function getSeverityClass(severity: Severity): string {
@@ -489,7 +516,11 @@ function App() {
                     </>
                   )}
                   <div className="bbqe-how-it-works">
+<<<<<<< HEAD
                     <p className="bbqe-hiw-text">WiFi Check analyzes network encryption, known vulnerability patterns, and security best practices. Stronger encryption (WPA3) scores higher. Open networks are most vulnerable.</p>
+=======
+                    <p className="bbqe-hiw-text">WiFi Check analyzes network encryption, known vulnerability patterns, and security best practices. Stronger encryption (WPA3) scores higher. Open networks score highest risk.</p>
+>>>>>>> origin/railway/code-change-ewnmeQ
                   </div>
                   <div className="bbqe-card-footer">
                     <p className="bbqe-card-footer-line">The Shield (Front of the House) and The Bond (Back Home)</p>
@@ -506,7 +537,11 @@ function App() {
               )}
               {!wifiResult && (
                 <div className="bbqe-how-it-works">
+<<<<<<< HEAD
                   <p className="bbqe-hiw-text">Enter your WiFi network name and encryption type above. BBQE checks for weak or deprecated encryption standards, known vulnerability patterns in your network configuration, and security best practices.</p>
+=======
+                  <p className="bbqe-hiw-text">Enter your WiFi network name and encryption type above. BBQE checks for weak or deprecated encryption standards, known vulnerability patterns in your network name, and overall security posture.</p>
+>>>>>>> origin/railway/code-change-ewnmeQ
                 </div>
               )}
             </div>
@@ -514,6 +549,7 @@ function App() {
 
           {activeTab === 'breach-scan' && (
             <div className="bbqe-tab-content">
+<<<<<<< HEAD
               {isSubscribed ? (
                 <>
                   <h2 className="bbqe-section-title">Check for Breaches</h2>
