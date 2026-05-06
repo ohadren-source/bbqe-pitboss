@@ -79,6 +79,11 @@ function App() {
   const [wifiSSID, setWifiSSID] = useState('')
   const [wifiEncryption, setWifiEncryption] = useState('WPA2')
   const [wifiResult, setWifiResult] = useState<WiFiResult | null>(null)
+
+  // Breach Scan state
+  const [breachEmail, setBreachEmail] = useState('')
+  const [breachResult, setBreachResult] = useState<ScanResult | null>(null)
+  const [breachScannedEmail, setBreachScannedEmail] = useState('')
   
   // Breach Scan state
   const [breachEmail, setBreachEmail] = useState('')
@@ -91,6 +96,8 @@ function App() {
 
   useEffect(() => {
     syncUsageCount()
+    // TEMPORARY: Set counter to 99 for WiFi testing
+    setCounterForTesting()
   }, [])
 
   useEffect(() => {
@@ -118,6 +125,29 @@ function App() {
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : 'unknown'
       console.log('Usage sync skipped:', msg)
+    }
+  }
+
+  async function setCounterForTesting() {
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/test/set-counter`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customerId: fpManager.getFingerprint(),
+          app_name: 'bbqe',
+          uses_remaining: 99
+        }),
+      })
+      if (response.ok) {
+        const data = await response.json()
+        console.log('[TEST] Counter set to 99 for WiFi testing:', data)
+        // Update local counter display
+        setScanCount(0)
+      }
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : 'unknown'
+      console.log('[TEST] Counter override skipped (endpoint may not be ready):', msg)
     }
   }
 
@@ -168,10 +198,11 @@ function App() {
       })
       if (!response.ok) {
         const errorData = await response.json()
-        if (response.status === 403) {
-          window.open(CHECKOUT_PAYMENT_LINK + '?app=bbqe', '_blank')
-          return
-        }
+        // TODO: Re-enable 403 error handling after testing
+        // if (response.status === 403) {
+        //   window.open(CHECKOUT_PAYMENT_LINK + '?app=bbqe', '_blank')
+        //   return
+        // }
         throw new Error(errorData.error || 'Failed to scan link')
       }
       const data = await response.json()
@@ -217,10 +248,11 @@ function App() {
       })
       if (!response.ok) {
         const errorData = await response.json()
-        if (response.status === 403) {
-          window.open(CHECKOUT_PAYMENT_LINK + '?app=bbqe', '_blank')
-          return
-        }
+        // TODO: Re-enable 403 error handling after testing
+        // if (response.status === 403) {
+        //   window.open(CHECKOUT_PAYMENT_LINK + '?app=bbqe', '_blank')
+        //   return
+        // }
         throw new Error(errorData.error || 'Failed to analyze WiFi network')
       }
       const data = await response.json()
@@ -554,9 +586,9 @@ function App() {
 
           <div className="bbqe-tiers-table">
             <h2 className="bbqe-section-title">Plans</h2>
-            <div className="bbqe-tier-row"><div className="bbqe-tier-name">Free</div><div className="bbqe-tier-desc">Link Scanner + WiFi Check (9 total scans)</div></div>
+            <div className="bbqe-tier-row"><div className="bbqe-tier-name">Free</div><div className="bbqe-tier-desc">Link Scanner + WiFi Check + Breach Scan (9 total scans)</div></div>
             <div className="bbqe-tier-row"><div className="bbqe-tier-name bbqe-tier-premium">Premium</div><div className="bbqe-tier-desc">+ Unlimited scans</div></div>
-            <div className="bbqe-tier-row"><div className="bbqe-tier-name bbqe-tier-pitboss">PitBoss</div><div className="bbqe-tier-desc">+ Breach Scanner (unlimited)</div></div>
+            <div className="bbqe-tier-row"><div className="bbqe-tier-name bbqe-tier-pitboss">PitBoss</div><div className="bbqe-tier-desc">Breach Scanner (unlimited)</div></div>
           </div>
         </main>
 
