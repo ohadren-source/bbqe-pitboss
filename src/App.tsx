@@ -3,6 +3,16 @@ import './App.css'
 import Landing from './Landing'
 import { FingerprintManager } from '@sauc-e/fingerprint-manager'
 
+function getPersistentFingerprint(): string {
+  let fingerprint = localStorage.getItem('bbqe_fingerprint')
+  if (!fingerprint) {
+    const fpManager = new FingerprintManager()
+    fingerprint = fpManager.getFingerprint()
+    localStorage.setItem('bbqe_fingerprint', fingerprint)
+  }
+  return fingerprint
+}
+
 const BACKEND_URL = 'https://sauc-e-backend-production.up.railway.app'
 const FREE_SCAN_LIMIT = 9
 const CHECKOUT_PAYMENT_LINK = 'https://www.sauc-e.com/checkitout'
@@ -76,6 +86,7 @@ function App() {
   const [breachScannedEmail, setBreachScannedEmail] = useState('')
   
   const [loading, setLoading] = useState(false)
+  const [customerId] = useState<string>(() => getPersistentFingerprint())
   const fpManager = new FingerprintManager()
 
   const freeLeft = Math.max(0, FREE_SCAN_LIMIT - scanCount)
@@ -96,12 +107,28 @@ function App() {
     }
   }, [])
 
+  async function persistCounterToBackend(count: number) {
+    try {
+      await fetch(`${BACKEND_URL}/api/bbqe/update-usage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customerId: customerId,
+          usageCount: count
+        })
+      })
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : 'unknown'
+      console.log('Failed to persist counter:', msg)
+    }
+  }
+
   async function syncUsageCount() {
     try {
       const response = await fetch(`${BACKEND_URL}/api/bbqe/usage-status`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ customerId: fpManager.getFingerprint() }),
+        body: JSON.stringify({ customerId: customerId }),
       })
       if (response.ok) {
         const data = await response.json()
@@ -119,7 +146,7 @@ function App() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          customerId: fpManager.getFingerprint(),
+          customerId: customerId,
           app_name: 'bbqe',
           uses_remaining: 99
         }),
@@ -142,7 +169,7 @@ function App() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          customerId: fpManager.getFingerprint(),
+          customerId: customerId,
           subscription_id: paymentInfo.subscription_id,
           payment_provider: paymentInfo.payment_provider,
         }),
@@ -177,7 +204,7 @@ function App() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          customerId: fpManager.getFingerprint(),
+          customerId: customerId,
           url: submittedUrl,
         }),
       })
@@ -200,6 +227,8 @@ function App() {
       setScannedUrl(submittedUrl)
       // TODO: Re-enable counter increment after testing
       // setScanCount((prev) => prev + 1)
+      setScanCount((prev) => prev + 1)
+      persistCounterToBackend(scanCount + 1)
       setUrl('')
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : 'Failed to process request'
@@ -226,7 +255,7 @@ function App() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          customerId: fpManager.getFingerprint(),
+          customerId: customerId,
           ssid: submittedSSID,
           security: wifiEncryption,
         }),
@@ -252,6 +281,8 @@ function App() {
       })
       // TODO: Re-enable counter increment after testing
       // setScanCount((prev) => prev + 1)
+      setScanCount((prev) => prev + 1)
+      persistCounterToBackend(scanCount + 1)
       setWifiSSID('')
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : 'Failed to process request'
@@ -277,7 +308,7 @@ function App() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          customerId: fpManager.getFingerprint(),
+          customerId: customerId,
           email: submittedEmail,
         }),
       })
@@ -302,6 +333,7 @@ function App() {
       })
       setBreachScannedEmail(submittedEmail)
       setScanCount((prev) => prev + 1)
+      persistCounterToBackend(scanCount + 1)
       setBreachEmail('')
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : 'Failed to process request'
