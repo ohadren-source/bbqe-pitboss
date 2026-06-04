@@ -87,7 +87,6 @@ function App() {
   
   const [loading, setLoading] = useState(false)
   const [customerId] = useState<string>(() => getPersistentFingerprint())
-  const fpManager = new FingerprintManager()
 
   const freeLeft = Math.max(0, FREE_SCAN_LIMIT - scanCount)
 
